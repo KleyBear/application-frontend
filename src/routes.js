@@ -3,7 +3,7 @@ import React from 'react'
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 const Colors = React.lazy(() => import('./views/theme/colors/Colors'))
 const Typography = React.lazy(() => import('./views/theme/typography/Typography'))
-const Users = React.lazy(() => import('./views/users/users'))
+const Users = React.lazy(() => import('./views/users/uses'))
 const products = React.lazy(() => import('./views/products/products'))
 const CategoryProducts = React.lazy(() => import('./views/products/CategoryProducts'))
 const setting = React.lazy(() => import('./views/setting/setting'))
@@ -110,7 +110,6 @@ const routes = [
   { path: '/notifications/toasts', name: 'Toasts', element: Toasts },
   { path: '/widgets', name: 'Widgets', element: Widgets },
   //my path camila
-  { path: '/users', name: 'Users', element: Users },
   { path: '/products', name: 'Products', element: products },
   {
     path: '/products/category/:id/:name_category',

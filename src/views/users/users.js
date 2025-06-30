@@ -1,6 +1,6 @@
+ branch/shlendy
 import { useEffect, useState } from 'react'
-import {
-  CAvatar,
+======= CAvatar,
   CCard,
   CCardBody,
   CCardHeader,
@@ -10,7 +10,6 @@ import {
   CTableHead,
   CTableHeaderCell,
   CTableRow,
-  CButton,
   CModal,
   CModalHeader,
   CModalTitle,
@@ -115,7 +114,7 @@ const Users = () => {
   }
 
   // Función la actualización de un usuario
-  const handleUpdate = async () => {
+  const handleUpdat = async () => {
     try {
       const response = await fetch(`http://localhost:8000/user/${selectedUser.id}`, {
         method: 'PUT',
@@ -145,7 +144,7 @@ const Users = () => {
   const handleAdd = async () => {
     const newUser = { ...addFormData }
     try {
-      const response = await fetch('http://localhost:8000/user', {
+      const response = await fetch('http://localhost:800/user', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
