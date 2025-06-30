@@ -14,6 +14,7 @@ import {
 } from '@coreui/react'
 import './scss/style.scss'
 import './scss/examples.scss'
+import routes from './routes'
 
 // Containers
 const DefaultLayout = React.lazy(() => import('./layout/DefaultLayout'))

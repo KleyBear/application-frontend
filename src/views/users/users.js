@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react'
-import {
-  CAvatar,
+ branch/shlendy
+import { useEffect, useState } from 'react'
+======= CAvatar,
   CCard,
   CCardBody,
   CCardHeader,
@@ -18,7 +18,6 @@ import {
   CFormInput,
   CContainer,
   CForm,
-  CNavbar,
   CFormLabel,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
