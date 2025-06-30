@@ -15,10 +15,6 @@ const SaleFormDrawer = ({ visible, onClose }) => {
       <COffcanvasBody>
         {/* Aquí va tu formulario o inputs */}
         <p>Contenido del formulario...</p>
-
-        <CButton color="danger" onClick={onClose} className="mt-3 w-100">
-          Cerrar
-        </CButton>
       </COffcanvasBody>
     </COffcanvas>
   )
