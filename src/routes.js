@@ -7,7 +7,7 @@ const Users = React.lazy(() => import('./views/users/users'))
 const products = React.lazy(() => import('./views/products/products'))
 const CategoryProducts = React.lazy(() => import('./views/products/CategoryProducts'))
 const setting = React.lazy(() => import('./views/setting/setting'))
-const Sales = React.lazy(() => import('./views/Sales/Sales.js'))
+const NewSale = React.lazy(() => import('./views/Sales/NewSale.js'))
 const investment = React.lazy(() => import('./views/investment/investment.js'))
 const General = React.lazy(() => import('./views/setting/General'))
 const Profile = React.lazy(() => import('./views/setting/Profile'))
@@ -62,7 +62,7 @@ const Widgets = React.lazy(() => import('./views/widgets/Widgets'))
 const Login = React.lazy(() => import('./views/pages/login/Login'))
 
 const routes = [
-  { path: '/Sales', name: 'Sales', element: Sales },
+  { path: '/newSale', name: 'NewSale', element: NewSale },
   { path: '/investment', name: 'investment', element: investment },
   { path: '/', exact: true, name: 'Home' },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard },

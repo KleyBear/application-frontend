@@ -3,6 +3,8 @@ import { useSelector, useDispatch } from 'react-redux'
 import { CContainer, CHeader, CHeaderNav, CHeaderToggler, CNavItem } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilBell, cilMenu } from '@coreui/icons'
+import SimpleBar from 'simplebar-react'
+import 'simplebar-react/dist/simplebar.min.css'
 
 import ModalVerticallyCenteredScrollableExample from './NotificationModal.js'
 import { AppHeaderDropdown } from './header/index'
@@ -53,7 +55,6 @@ const AppHeader = () => {
             <AppHeaderDropdown />
           </CHeaderNav>
         </CContainer>
-        <CContainer className="px-4" fluid></CContainer>
       </CHeader>
       <ModalVerticallyCenteredScrollableExample
         visible={isModalVisible}

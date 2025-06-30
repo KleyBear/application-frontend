@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   CAvatar,
   CCard,
@@ -19,7 +19,6 @@ import {
   CFormInput,
   CContainer,
   CForm,
-  CNavbar,
   CFormLabel,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
