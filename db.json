@@ -328,6 +328,15 @@
       "status": "PENDING",
       "payment_method": "Cash",
       "id_user": "5c35"
+    },
+    {
+      "id": "df96",
+      "date": "2025-07-02T00:34:14.618Z",
+      "total": 40,
+      "description": "",
+      "status": "PENDING",
+      "payment_method": "Cash",
+      "id_user": "5c35"
     }
   ],
   "sale_detail": [
@@ -466,6 +475,12 @@
       "amount": 1,
       "subtotal": 40,
       "id_product": "a4f3"
+    },
+    {
+      "id": "304b",
+      "amount": 1,
+      "subtotal": 40,
+      "id_product": "31fa"
     }
   ],
   "expense_category": [
@@ -591,12 +606,14 @@
     {
       "id_accounts_receivable": 1,
       "expiration_date": "2023-05-15",
-      "id_sale": "696f"
+      "id_sale": "696f",
+      "id": "3069"
     },
     {
       "id_accounts_receivable": 2,
       "expiration_date": "2023-06-20",
-      "id_sale": "eddf"
+      "id_sale": "eddf",
+      "id": "c34e"
     }
   ],
   "payment": [
@@ -605,35 +622,40 @@
       "payment_date": "2023-06-18",
       "amount_paid": 150.75,
       "payment_method": "TRANSFER",
-      "id_accounts_receivable": 2
+      "id_accounts_receivable": 2,
+      "id": "7765"
     },
     {
       "id_payment": 2,
       "payment_date": "2023-07-05",
       "amount_paid": 200,
       "payment_method": "TRANSFER",
-      "id_accounts_receivable": 2
+      "id_accounts_receivable": 2,
+      "id": "1156"
     },
     {
       "id_payment": 3,
       "payment_date": "2023-07-20",
       "amount_paid": 75.5,
       "payment_method": "CASH",
-      "id_accounts_receivable": 2
+      "id_accounts_receivable": 2,
+      "id": "e26d"
     },
     {
       "id_payment": 4,
       "payment_date": "2023-08-01",
       "amount_paid": 120,
       "payment_method": "CARD",
-      "id_accounts_receivable": 1
+      "id_accounts_receivable": 1,
+      "id": "9098"
     },
     {
       "id_payment": 5,
       "payment_date": "2023-08-10",
       "amount_paid": 300.25,
       "payment_method": "CASH",
-      "id_accounts_receivable": 2
+      "id_accounts_receivable": 2,
+      "id": "4f2f"
     }
   ]
 }

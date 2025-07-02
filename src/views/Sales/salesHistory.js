@@ -100,38 +100,45 @@ const SalesHistory = () => {
     fetchData()
   }, [])
 
+  // 🔥 Filtro actualizado incluyendo fechas y buscador según rol
   useEffect(() => {
     let filtered = [...salesWithDetails]
 
+    // Filtrar por estado
     if (filterStatus) {
       filtered = filtered.filter((sale) => sale.status === filterStatus)
     }
 
+    // Filtrar por usuario (requiere que tenga rol seleccionado)
     if (filterUserName && filterUserName.trim() !== '') {
       const searchLower = filterUserName.toLowerCase()
       filtered = filtered.filter(
         (sale) =>
           sale.userRole?.name_role === filterUserRole &&
-          sale.user?.user_name.toLowerCase().includes(searchLower),
+          sale.user?.user_name.toLowerCase().includes(searchLower)
       )
     } else if (filterUserRole) {
+      // Filtrar por rol si no hay búsqueda por nombre
       filtered = filtered.filter((sale) => sale.userRole?.name_role === filterUserRole)
     }
 
+    // Filtrar por categoría
     if (filterCategory) {
       filtered = filtered.filter((sale) =>
-        sale.details.some((detail) => detail.product?.id_category === filterCategory),
+        sale.details.some((detail) => detail.product?.id_category === filterCategory)
       )
     }
 
+    // 🔥 Filtrar por fecha desde
     if (dateFrom) {
       const fromDate = new Date(dateFrom)
       filtered = filtered.filter((sale) => new Date(sale.date) >= fromDate)
     }
 
+    // 🔥 Filtrar por fecha hasta
     if (dateTo) {
       const toDate = new Date(dateTo)
-      toDate.setHours(23, 59, 59, 999)
+      toDate.setHours(23, 59, 59, 999) // Incluye todo el día
       filtered = filtered.filter((sale) => new Date(sale.date) <= toDate)
     }
 
@@ -164,7 +171,74 @@ const SalesHistory = () => {
   return (
     <CCard className="mb-4">
       <CCardHeader>
-        <CRow className="align-items-center g-2">{/* ... filtros ... */}</CRow>
+        <CRow className="align-items-center g-2">
+          {/* Estado */}
+          <CCol xs="6" sm="3" md="2" lg="2" className="d-flex gap-2">
+            <CDropdown style={{ flex: 1 }}>
+              <CDropdownToggle style={dropdownStyle}>
+                {filterStatus || 'Estado'}
+              </CDropdownToggle>
+              <CDropdownMenu>
+                <CDropdownItem onClick={() => setFilterStatus(null)}>Todos</CDropdownItem>
+                <CDropdownItem onClick={() => setFilterStatus('COMPLETED')}>COMPLETED</CDropdownItem>
+                <CDropdownItem onClick={() => setFilterStatus('PENDING')}>PENDING</CDropdownItem>
+              </CDropdownMenu>
+            </CDropdown>
+          </CCol>
+
+          {/* Tipo de usuario y buscador */}
+          <CCol xs="12" sm="6" md="5" lg="4" className="d-flex align-items-center gap-2">
+            <CDropdown style={{ width: '150px' }}>
+              <CDropdownToggle style={dropdownStyle}>
+                {filterUserRole || 'Realizada por'}
+              </CDropdownToggle>
+              <CDropdownMenu>
+                <CDropdownItem onClick={() => setFilterUserRole(null)}>Todos</CDropdownItem>
+                {roles.map((role) => (
+                  <CDropdownItem
+                    key={role.id_role}
+                    onClick={() => setFilterUserRole(role.name_role)}
+                  >
+                    {role.name_role.toUpperCase()}
+                  </CDropdownItem>
+                ))}
+              </CDropdownMenu>
+            </CDropdown>
+
+            <CFormInput
+              type="text"
+              placeholder="Buscar usuario"
+              value={filterUserName}
+              onChange={(e) => setFilterUserName(e.target.value)}
+              style={{ flex: 1, borderRadius: '25px' }}
+              disabled={!filterUserRole} // 🔥 Mantenemos como estaba
+            />
+          </CCol>
+
+          {/* Fecha desde */}
+          <CCol xs="6" sm="3" md="2" lg="2">
+            <CFormInput
+              type="date"
+              value={dateFrom}
+              onChange={(e) => setDateFrom(e.target.value)}
+              placeholder="Desde"
+              max={dateTo || ''}
+              style={{ textAlign: 'center' }}
+            />
+          </CCol>
+
+          {/* Fecha hasta */}
+          <CCol xs="6" sm="3" md="2" lg="2">
+            <CFormInput
+              type="date"
+              value={dateTo}
+              onChange={(e) => setDateTo(e.target.value)}
+              placeholder="Hasta"
+              min={dateFrom || ''}
+              style={{ textAlign: 'center' }}
+            />
+          </CCol>
+        </CRow>
       </CCardHeader>
 
       <CCardBody>
@@ -177,7 +251,9 @@ const SalesHistory = () => {
             )}
             {filteredSales.map((sale) => {
               const isActive = activeKey === sale.id_sale
-              const payment = paymentMethodLabels[sale.payment_method?.toLowerCase()] || null
+              const payment =
+                paymentMethodLabels[sale.payment_method?.toLowerCase()] || null
+
               return (
                 <CAccordionItem
                   key={sale.id_sale}
@@ -199,7 +275,7 @@ const SalesHistory = () => {
                     <div className="d-flex flex-column">
                       <small className={isActive ? 'text-dark' : 'text-white'}>
                         Fecha:{' '}
-                        <span className={isActive ? 'text-dark' : 'text-white'}>
+                        <span>
                           {new Date(sale.date).toLocaleString()}
                         </span>{' '}
                         — Estado:{' '}
@@ -208,10 +284,14 @@ const SalesHistory = () => {
                             sale.status === 'COMPLETED'
                               ? 'bg-success-subtle text-success-emphasis'
                               : sale.status === 'PENDING'
-                                ? 'bg-warning-subtle text-warning-emphasis'
-                                : 'bg-secondary-subtle text-secondary-emphasis'
+                              ? 'bg-warning-subtle text-warning-emphasis'
+                              : 'bg-secondary-subtle text-secondary-emphasis'
                           } ms-2`}
-                          style={{ borderRadius: '8px', padding: '4px 8px', fontWeight: '500' }}
+                          style={{
+                            borderRadius: '8px',
+                            padding: '4px 8px',
+                            fontWeight: '500',
+                          }}
                         >
                           {sale.status}
                         </span>
