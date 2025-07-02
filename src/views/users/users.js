@@ -1,6 +1,6 @@
- branch/shlendy
 import { useEffect, useState } from 'react'
-======= CAvatar,
+import {
+  CAvatar,
   CCard,
   CCardBody,
   CCardHeader,
@@ -19,6 +19,7 @@ import { useEffect, useState } from 'react'
   CContainer,
   CForm,
   CFormLabel,
+  CButton,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilPeople, cilPencil, cilTrash, cilCloudDownload, cilPlus } from '@coreui/icons'
@@ -114,7 +115,7 @@ const Users = () => {
   }
 
   // Función la actualización de un usuario
-  const handleUpdat = async () => {
+  const handleUpdate = async () => {
     try {
       const response = await fetch(`http://localhost:8000/user/${selectedUser.id}`, {
         method: 'PUT',
