@@ -14,7 +14,7 @@ import {
   CDropdownMenu,
   CDropdownToggle,
 } from '@coreui/react'
-import useFetch from '../../hooks/useFetch'
+import useFetch from '../../hooks/useFetch.js'
 import CIcon from '@coreui/icons-react'
 import { cilCart } from '@coreui/icons'
 import SaleFormDrawer from './SaleFormDrawer.js'
@@ -25,6 +25,9 @@ const NewSale = () => {
   const [selectedCategory, setSelectedCategory] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [drawerVisible, setDrawerVisible] = useState(false)
+
+  // NUEVO: carrito con productos seleccionados
+  const [selectedProducts, setSelectedProducts] = useState([])
 
   const { data: categoriesData } = useFetch('http://localhost:8000/category')
   const { data: productsData } = useFetch('http://localhost:8000/product')
@@ -46,6 +49,24 @@ const NewSale = () => {
   const filteredProducts = (catId) => {
     const all = productsByCategory[catId]?.products || []
     return all.filter((p) => p.description.toLowerCase().includes(searchQuery.toLowerCase()))
+  }
+
+  // FUNCION para agregar producto al carrito
+  const addProductToCart = (product) => {
+    setSelectedProducts((prev) => {
+      const index = prev.findIndex((p) => p.id === product.id)
+      if (index !== -1) {
+        // Ya existe: aumenta cantidad y subtotal
+        const updated = [...prev]
+        updated[index].amount += 1
+        updated[index].subtotal = updated[index].amount * updated[index].price_sale
+        return updated
+      } else {
+        // Nuevo producto con cantidad 1 y subtotal igual al precio
+        return [...prev, { ...product, amount: 1, subtotal: product.price_sale }]
+      }
+    })
+    setDrawerVisible(true) // Abrir drawer al añadir producto
   }
 
   return (
@@ -107,8 +128,14 @@ const NewSale = () => {
                         className="my-2"
                         options={['Seleccionar', 'S', 'M', 'L', 'XL']}
                       />
-                      <CButton color="primary" size="sm" className="w-100 text-white">
+                      <CButton
+                        color="primary"
+                        size="sm"
+                        className="w-100 text-white"
+                        onClick={() => addProductToCart(product)} // AÑADIDO
+                      >
                         <CIcon icon={cilCart} className="me-2" />
+                        Añadir al carrito
                       </CButton>
                     </div>
                   </CCard>
@@ -127,7 +154,7 @@ const NewSale = () => {
           position: 'fixed',
           bottom: '20px',
           right: '20px',
-          zIndex: 1300, // superior al drawer para que se vea encima si quieres
+          zIndex: 1300,
           width: '60px',
           height: '60px',
           display: 'flex',
@@ -140,7 +167,12 @@ const NewSale = () => {
         <CIcon icon={cilCart} size="xl" />
       </CButton>
 
-      <SaleFormDrawer visible={drawerVisible} onClose={() => setDrawerVisible(false)} />
+      <SaleFormDrawer
+        visible={drawerVisible}
+        onClose={() => setDrawerVisible(false)}
+        selectedProducts={selectedProducts} // PASO carrito
+        setSelectedProducts={setSelectedProducts} // PASO setter para actualizar cantidades
+      />
     </div>
   )
 }

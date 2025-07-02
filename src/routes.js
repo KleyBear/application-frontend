@@ -1,13 +1,14 @@
+import { element } from 'prop-types'
 import React from 'react'
 
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 const Colors = React.lazy(() => import('./views/theme/colors/Colors'))
 const Typography = React.lazy(() => import('./views/theme/typography/Typography'))
-const Users = React.lazy(() => import('./views/users/uses'))
+const Users = React.lazy(() => import('./views/users/users'))
 const products = React.lazy(() => import('./views/products/products'))
 const CategoryProducts = React.lazy(() => import('./views/products/CategoryProducts'))
 const setting = React.lazy(() => import('./views/setting/setting'))
-const NewSale = React.lazy(() => import('src/views/Sales/NewSale.js'))
+const NewSale = React.lazy(() => import('src/views/Sales/newSale.js'))
 const investment = React.lazy(() => import('./views/investment/investment.js'))
 const General = React.lazy(() => import('./views/setting/General'))
 const Profile = React.lazy(() => import('./views/setting/Profile'))
@@ -60,6 +61,9 @@ const Toasts = React.lazy(() => import('./views/notifications/toasts/Toasts'))
 
 const Widgets = React.lazy(() => import('./views/widgets/Widgets'))
 const Login = React.lazy(() => import('./views/pages/login/Login'))
+const SalesHistory = React.lazy(() => import('./views/Sales/salesHistory.js'))
+const SalesPage = React.lazy(() => import('src/views/Sales/SalesPage'))
+const AccountReceivable = React.lazy(() => import('src/views/account/accountReceivable.js'))
 
 const routes = [
   { path: '/newSale', name: 'NewSale', element: NewSale },
@@ -122,6 +126,10 @@ const routes = [
   { path: '/setting/notifications', name: 'Notification Settings', element: Notifications },
   { path: '/login', name: 'Login', element: Login },
   { path: '/suppliers', name: 'Suppliers', element: Suppliers },
+  { path: '/users', name: 'Users', element: Users },
+  { path: '/salesHistory', name: 'SalesHistory', element: SalesHistory },
+  { path: '/salesPage', name: 'SalesPage', element: SalesPage },
+  { path: '/accountReceivable', name: 'AccountReceivable', element: AccountReceivable },
 ]
 
 export default routes

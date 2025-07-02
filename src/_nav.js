@@ -11,15 +11,26 @@ const _nav = [
     icon: <CIcon icon={cilHome} customClassName="nav-icon" />,
   },
   {
-    component: CNavItem,
-    name: 'Products',
-    to: '/products',
-    icon: <CIcon icon={cilBasket} customClassName="nav-icon" />,
+    component: CNavGroup,
+    name: 'Inventory',
+    icon: <CIcon icon={cilNotes} customClassName="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: 'Products',
+        to: '/products',
+      },
+      {
+        component: CNavItem,
+        name: 'Providers',
+        to: '/suppliers',
+      },
+    ],
   },
   {
     component: CNavItem,
     name: 'Users',
-    to: '/Users',
+    to: '/users',
     icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
   },
   {
@@ -29,27 +40,32 @@ const _nav = [
     items: [
       {
         component: CNavItem,
-        name: 'newSale',
-        to: '/newSale',
+        name: 'new Sale',
+        to: '/salesPage',
       },
       {
         component: CNavItem,
-        name: 'sales history',
-        to: '/setting/profile',
+        name: 'Sales History',
+        to: '/salesHistory',
       },
     ],
   },
   {
-    component: CNavItem,
-    name: 'Investment',
-    to: '/investment',
-    icon: <CIcon icon={cilChartPie} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavItem,
-    name: 'Suppliers',
-    to: '/suppliers',
-    icon: <CIcon icon={cilChartPie} customClassName="nav-icon" />,
+    component: CNavGroup,
+    name: 'Accounts',
+    icon: <CIcon icon={cilNotes} customClassName="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: 'Account Receivable',
+        to: '/accountReceivable',
+      },
+      {
+        component: CNavItem,
+        name: 'Account Payable',
+        to: '/investment',
+      },
+    ],
   },
   {
     component: CNavGroup,

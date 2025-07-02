@@ -192,46 +192,280 @@
       "id": "5c35"
     }
   ],
-  "sales": [
+  "sale": [
     {
-      "id_sales": 1,
-      "fecha": "2025-05-01T10:30:00",
-      "total": 150.75,
-      "id_user": 2,
-      "id_customer": 5,
-      "id": "bda4"
+      "id_sale": 1,
+      "date": "2025-07-01T10:00:00",
+      "total": 120,
+      "description": "Venta de productos deportivos",
+      "status": "PENDING",
+      "id_user": "5c35",
+      "payment_method": "CASH",
+      "id": "3b7e"
     },
     {
-      "id_sales": 2,
-      "fecha": "2025-05-02T14:15:00",
-      "total": 320.5,
-      "id_user": 3,
-      "id_customer": 7,
-      "id": "22a9"
+      "id": "eddf",
+      "date": "2025-07-01T03:14:42.790Z",
+      "total": 900,
+      "description": "",
+      "status": "PENDING",
+      "payment_method": "CASH",
+      "id_user": "5c35"
     },
     {
-      "id_sales": 3,
-      "fecha": "2025-05-03T09:45:00",
-      "total": 89.99,
-      "id_user": 2,
-      "id_customer": 6,
-      "id": "b44c"
+      "id": "7f85",
+      "date": "2025-07-01T03:19:40.667Z",
+      "total": 0,
+      "description": "",
+      "status": "PENDING",
+      "payment_method": "TRANSFER",
+      "id_user": "5c35"
     },
     {
-      "id_sales": 4,
-      "fecha": "2025-05-04T17:20:00",
-      "total": 450,
-      "id_user": 4,
-      "id_customer": 8,
-      "id": "a16f"
+      "id": "696f",
+      "date": "2025-07-01T03:59:25.059Z",
+      "total": 200,
+      "description": "tobita ",
+      "status": "PENDING",
+      "payment_method": "TRANSFER",
+      "id_user": "5c35"
     },
     {
-      "id_sales": 5,
-      "fecha": "2025-05-05T12:00:00",
-      "total": 210.3,
-      "id_user": 3,
-      "id_customer": 5,
-      "id": "7f5b"
+      "id": "2d80",
+      "date": "2025-07-01T05:16:35.650Z",
+      "total": 80,
+      "description": "",
+      "status": "COMPLETED",
+      "payment_method": "CARD",
+      "id_user": "5c35"
+    },
+    {
+      "id": "e4b9",
+      "date": "2025-07-01T19:24:21.945Z",
+      "total": 225,
+      "description": "",
+      "status": "PENDING",
+      "payment_method": "CARD",
+      "id_user": "5c35"
+    },
+    {
+      "id": "8034",
+      "date": "2025-07-01T22:42:37.516Z",
+      "total": 40,
+      "description": "equis",
+      "status": "PENDING",
+      "payment_method": "Transfer",
+      "id_user": "5c35"
+    },
+    {
+      "id": "d8e6",
+      "date": "2025-07-01T22:49:10.848Z",
+      "total": 40,
+      "description": "fe",
+      "status": "PENDING",
+      "payment_method": "Cash",
+      "id_user": "5c35"
+    },
+    {
+      "id": "eb66",
+      "date": "2025-07-01T22:51:51.252Z",
+      "total": 40,
+      "description": "",
+      "status": "PENDING",
+      "payment_method": "Cash",
+      "id_user": "5c35"
+    },
+    {
+      "id": "cd43",
+      "date": "2025-07-01T22:52:49.334Z",
+      "total": 40,
+      "description": "",
+      "status": "PENDING",
+      "payment_method": "Cash",
+      "id_user": "5c35"
+    },
+    {
+      "id": "107a",
+      "date": "2025-07-01T22:54:26.241Z",
+      "total": 40,
+      "description": "",
+      "status": "PENDING",
+      "payment_method": "Cash",
+      "id_user": "5c35"
+    },
+    {
+      "id": "8767",
+      "date": "2025-07-01T22:55:49.552Z",
+      "total": 80,
+      "description": "",
+      "status": "PENDING",
+      "payment_method": "Cash",
+      "id_user": "5c35"
+    },
+    {
+      "id": "be54",
+      "date": "2025-07-01T23:40:01.713Z",
+      "total": 40,
+      "description": "",
+      "status": "PENDING",
+      "payment_method": "Cash",
+      "id_user": "5c35"
+    },
+    {
+      "id": "e8ce",
+      "date": "2025-07-02T00:09:09.674Z",
+      "total": 40,
+      "description": "",
+      "status": "PENDING",
+      "payment_method": "Cash",
+      "id_user": "5c35"
+    },
+    {
+      "id": "83f7",
+      "date": "2025-07-02T00:19:05.830Z",
+      "total": 40,
+      "description": "",
+      "status": "PENDING",
+      "payment_method": "Cash",
+      "id_user": "5c35"
+    }
+  ],
+  "sale_detail": [
+    {
+      "id_sale_detail": 1,
+      "amount": 2,
+      "subtotal": 60,
+      "id_product": "53c7",
+      "id_sale": 1,
+      "id": "5c75"
+    },
+    {
+      "id_sale_detail": 2,
+      "amount": 1,
+      "subtotal": 60,
+      "id_product": "287d",
+      "id_sale": 1,
+      "id": "f9d6"
+    },
+    {
+      "id": "100f",
+      "amount": 2,
+      "subtotal": 80,
+      "id_product": "ab36"
+    },
+    {
+      "id": "270d",
+      "amount": 1,
+      "subtotal": 40,
+      "id_product": "5e13"
+    },
+    {
+      "id": "cf8d",
+      "amount": 1,
+      "subtotal": 40,
+      "id_product": "53c7"
+    },
+    {
+      "id": "33ae",
+      "amount": 1,
+      "subtotal": 40,
+      "id_product": "a4f3"
+    },
+    {
+      "id": "4e09",
+      "amount": 1,
+      "subtotal": 40,
+      "id_product": "ab36"
+    },
+    {
+      "id": "9b0a",
+      "amount": 1,
+      "subtotal": 40,
+      "id_product": "53c7"
+    },
+    {
+      "id": "3825",
+      "amount": 1,
+      "subtotal": 40,
+      "id_product": "5e13"
+    },
+    {
+      "id": "7751",
+      "amount": 1,
+      "subtotal": 40,
+      "id_product": "ab36"
+    },
+    {
+      "id": "5737",
+      "amount": 1,
+      "subtotal": 40,
+      "id_product": "53c7"
+    },
+    {
+      "id": "0d54",
+      "amount": 3,
+      "subtotal": 105,
+      "id_product": "e8e5"
+    },
+    {
+      "id": "f4ad",
+      "amount": 1,
+      "subtotal": 40,
+      "id_product": "5e13"
+    },
+    {
+      "id": "ae21",
+      "amount": 1,
+      "subtotal": 40,
+      "id_product": "a4f3"
+    },
+    {
+      "id": "29ff",
+      "amount": 1,
+      "subtotal": 40,
+      "id_product": "a4f3"
+    },
+    {
+      "id": "6200",
+      "amount": 1,
+      "subtotal": 40,
+      "id_product": "a4f3"
+    },
+    {
+      "id": "a01a",
+      "amount": 1,
+      "subtotal": 40,
+      "id_product": "a4f3"
+    },
+    {
+      "id": "e048",
+      "amount": 1,
+      "subtotal": 40,
+      "id_product": "a4f3"
+    },
+    {
+      "id": "b3d2",
+      "amount": 1,
+      "subtotal": 40,
+      "id_product": "31fa"
+    },
+    {
+      "id": "51ac",
+      "amount": 1,
+      "subtotal": 40,
+      "id_product": "a4f3"
+    },
+    {
+      "id": "f1fc",
+      "amount": 1,
+      "subtotal": 40,
+      "id_product": "5e13"
+    },
+    {
+      "id": "dcd4",
+      "amount": 1,
+      "subtotal": 40,
+      "id_product": "a4f3"
     }
   ],
   "expense_category": [
@@ -351,6 +585,55 @@
       "name": "Servicios Comerciales del Sur",
       "number": "0416-7788990",
       "id": "b553"
+    }
+  ],
+  "accounts_receivable": [
+    {
+      "id_accounts_receivable": 1,
+      "expiration_date": "2023-05-15",
+      "id_sale": "696f"
+    },
+    {
+      "id_accounts_receivable": 2,
+      "expiration_date": "2023-06-20",
+      "id_sale": "eddf"
+    }
+  ],
+  "payment": [
+    {
+      "id_payment": 1,
+      "payment_date": "2023-06-18",
+      "amount_paid": 150.75,
+      "payment_method": "TRANSFER",
+      "id_accounts_receivable": 2
+    },
+    {
+      "id_payment": 2,
+      "payment_date": "2023-07-05",
+      "amount_paid": 200,
+      "payment_method": "TRANSFER",
+      "id_accounts_receivable": 2
+    },
+    {
+      "id_payment": 3,
+      "payment_date": "2023-07-20",
+      "amount_paid": 75.5,
+      "payment_method": "CASH",
+      "id_accounts_receivable": 2
+    },
+    {
+      "id_payment": 4,
+      "payment_date": "2023-08-01",
+      "amount_paid": 120,
+      "payment_method": "CARD",
+      "id_accounts_receivable": 1
+    },
+    {
+      "id_payment": 5,
+      "payment_date": "2023-08-10",
+      "amount_paid": 300.25,
+      "payment_method": "CASH",
+      "id_accounts_receivable": 2
     }
   ]
 }
