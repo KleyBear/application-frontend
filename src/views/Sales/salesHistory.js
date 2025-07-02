@@ -48,27 +48,41 @@ const SalesHistory = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [saleRes, detailRes, productRes, userRes, categoryRes, roleRes] = await Promise.all([
+        const [
+          saleRes,
+          detailRes,
+          productRes,
+          userRes,
+          categoryRes,
+          roleRes,
+          accountRes,
+          paymentRes,
+        ] = await Promise.all([
           fetch('http://localhost:8000/sale'),
           fetch('http://localhost:8000/sale_detail'),
           fetch('http://localhost:8000/product'),
           fetch('http://localhost:8000/user'),
           fetch('http://localhost:8000/category'),
           fetch('http://localhost:8000/role'),
+          fetch('http://localhost:8000/accounts_receivable'),
+          fetch('http://localhost:8000/payment'),
         ])
 
-        const [sales, details, products, users, categoriesData, rolesData] = await Promise.all([
-          saleRes.json(),
-          detailRes.json(),
-          productRes.json(),
-          userRes.json(),
-          categoryRes.json(),
-          roleRes.json(),
-        ])
+        const [sales, details, products, users, categoriesData, rolesData, accounts, payments] =
+          await Promise.all([
+            saleRes.json(),
+            detailRes.json(),
+            productRes.json(),
+            userRes.json(),
+            categoryRes.json(),
+            roleRes.json(),
+            accountRes.json(),
+            paymentRes.json(),
+          ])
 
         const combined = sales.map((sale) => {
           const relatedDetails = details
-            .filter((d) => d.id_sale === sale.id_sale)
+            .filter((d) => d.id_sale === sale.id)
             .map((d) => {
               const product = products.find((p) => p.id === d.id_product)
               return {
@@ -80,11 +94,23 @@ const SalesHistory = () => {
           const user = users.find((u) => u.id === sale.id_user)
           const role = user ? rolesData.find((r) => r.id_role === user.id_role) : null
 
+          const accountReceivable = accounts.find((acc) => acc.id_sale === sale.id)
+
+          let pendingAmount = 0
+          if (accountReceivable) {
+            const relatedPayments = payments.filter(
+              (p) => p.id_accounts_receivable === accountReceivable.id,
+            )
+            const paidAmount = relatedPayments.reduce((sum, p) => sum + p.amount_paid, 0)
+            pendingAmount = sale.total - paidAmount
+          }
+
           return {
             ...sale,
             details: relatedDetails,
             user,
             userRole: role,
+            pendingAmount,
           }
         })
 
@@ -100,16 +126,13 @@ const SalesHistory = () => {
     fetchData()
   }, [])
 
-  // 🔥 Filtro actualizado incluyendo fechas y buscador según rol
   useEffect(() => {
     let filtered = [...salesWithDetails]
 
-    // Filtrar por estado
     if (filterStatus) {
       filtered = filtered.filter((sale) => sale.status === filterStatus)
     }
 
-    // Filtrar por usuario (requiere que tenga rol seleccionado)
     if (filterUserName && filterUserName.trim() !== '') {
       const searchLower = filterUserName.toLowerCase()
       filtered = filtered.filter(
@@ -118,28 +141,31 @@ const SalesHistory = () => {
           sale.user?.user_name.toLowerCase().includes(searchLower)
       )
     } else if (filterUserRole) {
-      // Filtrar por rol si no hay búsqueda por nombre
       filtered = filtered.filter((sale) => sale.userRole?.name_role === filterUserRole)
     }
 
-    // Filtrar por categoría
     if (filterCategory) {
       filtered = filtered.filter((sale) =>
         sale.details.some((detail) => detail.product?.id_category === filterCategory)
       )
     }
 
-    // 🔥 Filtrar por fecha desde
+    // ✅ Filtrar por fecha desde
     if (dateFrom) {
-      const fromDate = new Date(dateFrom)
-      filtered = filtered.filter((sale) => new Date(sale.date) >= fromDate)
+      const fromDate = new Date(dateFrom + 'T00:00:00')
+      filtered = filtered.filter((sale) => {
+        const saleDate = new Date(sale.date)
+        return saleDate >= fromDate
+      })
     }
 
-    // 🔥 Filtrar por fecha hasta
+    // ✅ Filtrar por fecha hasta
     if (dateTo) {
-      const toDate = new Date(dateTo)
-      toDate.setHours(23, 59, 59, 999) // Incluye todo el día
-      filtered = filtered.filter((sale) => new Date(sale.date) <= toDate)
+      const toDate = new Date(dateTo + 'T23:59:59')
+      filtered = filtered.filter((sale) => {
+        const saleDate = new Date(sale.date)
+        return saleDate <= toDate
+      })
     }
 
     setFilteredSales(filtered)
@@ -172,7 +198,6 @@ const SalesHistory = () => {
     <CCard className="mb-4">
       <CCardHeader>
         <CRow className="align-items-center g-2">
-          {/* Estado */}
           <CCol xs="6" sm="3" md="2" lg="2" className="d-flex gap-2">
             <CDropdown style={{ flex: 1 }}>
               <CDropdownToggle style={dropdownStyle}>
@@ -186,7 +211,6 @@ const SalesHistory = () => {
             </CDropdown>
           </CCol>
 
-          {/* Tipo de usuario y buscador */}
           <CCol xs="12" sm="6" md="5" lg="4" className="d-flex align-items-center gap-2">
             <CDropdown style={{ width: '150px' }}>
               <CDropdownToggle style={dropdownStyle}>
@@ -211,11 +235,10 @@ const SalesHistory = () => {
               value={filterUserName}
               onChange={(e) => setFilterUserName(e.target.value)}
               style={{ flex: 1, borderRadius: '25px' }}
-              disabled={!filterUserRole} // 🔥 Mantenemos como estaba
+              disabled={!filterUserRole}
             />
           </CCol>
 
-          {/* Fecha desde */}
           <CCol xs="6" sm="3" md="2" lg="2">
             <CFormInput
               type="date"
@@ -227,7 +250,6 @@ const SalesHistory = () => {
             />
           </CCol>
 
-          {/* Fecha hasta */}
           <CCol xs="6" sm="3" md="2" lg="2">
             <CFormInput
               type="date"
@@ -250,15 +272,13 @@ const SalesHistory = () => {
               <p className="text-center">No se encontraron ventas con esos filtros.</p>
             )}
             {filteredSales.map((sale) => {
-              const isActive = activeKey === sale.id_sale
-              const payment =
-                paymentMethodLabels[sale.payment_method?.toLowerCase()] || null
-
+              const isActive = activeKey === sale.id
+              const payment = paymentMethodLabels[sale.payment_method?.toLowerCase()] || null
               return (
                 <CAccordionItem
-                  key={sale.id_sale}
-                  itemKey={sale.id_sale}
-                  onClick={() => handleToggle(sale.id_sale)}
+                  key={sale.id}
+                  itemKey={sale.id}
+                  onClick={() => handleToggle(sale.id)}
                   style={{
                     borderRadius: '12px',
                     marginBottom: '10px',
@@ -300,6 +320,9 @@ const SalesHistory = () => {
                         Usuario: {sale.user?.user_name || 'Desconocido'} (
                         {sale.userRole?.name_role.toUpperCase() || 'N/A'})
                       </small>
+                      <p>
+                        <strong>Descripción:</strong> {sale.description || '-'}
+                      </p>
                     </div>
                   </CAccordionHeader>
 
@@ -310,9 +333,6 @@ const SalesHistory = () => {
                       padding: '1rem',
                     }}
                   >
-                    <p>
-                      <strong>Descripción:</strong> {sale.description || '-'}
-                    </p>
                     <p>
                       <strong>Total:</strong> ${sale.total.toFixed(2)}{' '}
                       {sale.status === 'COMPLETED' && payment && (
@@ -338,6 +358,13 @@ const SalesHistory = () => {
                         </li>
                       ))}
                     </ul>
+
+                    {sale.pendingAmount !== undefined && (
+                      <p className="mt-3">
+                        <strong>Monto pendiente:</strong>{' '}
+                        <span className="text-danger">${sale.pendingAmount.toFixed(2)}</span>
+                      </p>
+                    )}
                   </CAccordionBody>
                 </CAccordionItem>
               )
