@@ -48,27 +48,41 @@ const SalesHistory = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [saleRes, detailRes, productRes, userRes, categoryRes, roleRes] = await Promise.all([
+        const [
+          saleRes,
+          detailRes,
+          productRes,
+          userRes,
+          categoryRes,
+          roleRes,
+          accountRes,
+          paymentRes,
+        ] = await Promise.all([
           fetch('http://localhost:8000/sale'),
           fetch('http://localhost:8000/sale_detail'),
           fetch('http://localhost:8000/product'),
           fetch('http://localhost:8000/user'),
           fetch('http://localhost:8000/category'),
           fetch('http://localhost:8000/role'),
+          fetch('http://localhost:8000/accounts_receivable'),
+          fetch('http://localhost:8000/payment'),
         ])
 
-        const [sales, details, products, users, categoriesData, rolesData] = await Promise.all([
-          saleRes.json(),
-          detailRes.json(),
-          productRes.json(),
-          userRes.json(),
-          categoryRes.json(),
-          roleRes.json(),
-        ])
+        const [sales, details, products, users, categoriesData, rolesData, accounts, payments] =
+          await Promise.all([
+            saleRes.json(),
+            detailRes.json(),
+            productRes.json(),
+            userRes.json(),
+            categoryRes.json(),
+            roleRes.json(),
+            accountRes.json(),
+            paymentRes.json(),
+          ])
 
         const combined = sales.map((sale) => {
           const relatedDetails = details
-            .filter((d) => d.id_sale === sale.id_sale)
+            .filter((d) => d.id_sale === sale.id)
             .map((d) => {
               const product = products.find((p) => p.id === d.id_product)
               return {
@@ -80,11 +94,28 @@ const SalesHistory = () => {
           const user = users.find((u) => u.id === sale.id_user)
           const role = user ? rolesData.find((r) => r.id_role === user.id_role) : null
 
+          // Buscar cuenta por cobrar asociada a la venta
+          const accountReceivable = accounts.find((acc) => acc.id_sale === sale.id)
+
+          // Si existe cuenta por cobrar, calcular monto pendiente
+          let pendingAmount = 0
+          if (accountReceivable) {
+            const relatedPayments = payments.filter(
+              (p) => p.id_accounts_receivable === accountReceivable.id,
+            )
+            const paidAmount = relatedPayments.reduce((sum, p) => sum + p.amount_paid, 0)
+            pendingAmount = sale.total - paidAmount
+          } else {
+            // Si no hay cuenta por cobrar, monto pendiente es 0
+            pendingAmount = 0
+          }
+
           return {
             ...sale,
             details: relatedDetails,
             user,
             userRole: role,
+            pendingAmount,
           }
         })
 
@@ -176,13 +207,13 @@ const SalesHistory = () => {
               <p className="text-center">No se encontraron ventas con esos filtros.</p>
             )}
             {filteredSales.map((sale) => {
-              const isActive = activeKey === sale.id_sale
+              const isActive = activeKey === sale.id
               const payment = paymentMethodLabels[sale.payment_method?.toLowerCase()] || null
               return (
                 <CAccordionItem
-                  key={sale.id_sale}
-                  itemKey={sale.id_sale}
-                  onClick={() => handleToggle(sale.id_sale)}
+                  key={sale.id}
+                  itemKey={sale.id}
+                  onClick={() => handleToggle(sale.id)}
                   style={{
                     borderRadius: '12px',
                     marginBottom: '10px',
@@ -220,6 +251,9 @@ const SalesHistory = () => {
                         Usuario: {sale.user?.user_name || 'Desconocido'} (
                         {sale.userRole?.name_role.toUpperCase() || 'N/A'})
                       </small>
+                      <p>
+                        <strong>Descripción:</strong> {sale.description || '-'}
+                      </p>
                     </div>
                   </CAccordionHeader>
 
@@ -230,9 +264,6 @@ const SalesHistory = () => {
                       padding: '1rem',
                     }}
                   >
-                    <p>
-                      <strong>Descripción:</strong> {sale.description || '-'}
-                    </p>
                     <p>
                       <strong>Total:</strong> ${sale.total.toFixed(2)}{' '}
                       {sale.status === 'COMPLETED' && payment && (
@@ -258,6 +289,14 @@ const SalesHistory = () => {
                         </li>
                       ))}
                     </ul>
+
+                    {/* Monto pendiente debajo de los detalles */}
+                    {sale.pendingAmount !== undefined && (
+                      <p className="mt-3">
+                        <strong>Monto pendiente:</strong>{' '}
+                        <span className="text-danger">${sale.pendingAmount.toFixed(2)}</span>
+                      </p>
+                    )}
                   </CAccordionBody>
                 </CAccordionItem>
               )

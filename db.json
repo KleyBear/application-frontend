@@ -194,7 +194,6 @@
   ],
   "sale": [
     {
-      "id_sale": 1,
       "date": "2025-07-01T10:00:00",
       "total": 120,
       "description": "Venta de productos deportivos",
@@ -204,129 +203,102 @@
       "id": "3b7e"
     },
     {
-      "id": "eddf",
-      "date": "2025-07-01T03:14:42.790Z",
-      "total": 900,
-      "description": "",
+      "id": "5f1a",
+      "date": "2025-07-02T06:40:04.447Z",
+      "total": 120,
+      "description": "3.2",
       "status": "PENDING",
       "payment_method": "CASH",
       "id_user": "5c35"
     },
     {
-      "id": "7f85",
-      "date": "2025-07-01T03:19:40.667Z",
-      "total": 0,
+      "id": "ebc3",
+      "date": "2025-07-02T06:52:24.505Z",
+      "total": 85,
+      "description": "3.3",
+      "status": "COMPLETED",
+      "payment_method": "CASH",
+      "id_user": "5c35"
+    },
+    {
+      "id": "8520",
+      "date": "2025-07-02T07:08:46.398Z",
+      "total": 40,
+      "description": "",
+      "status": "PENDING",
+      "payment_method": "Cash",
+      "id_user": "5c35"
+    },
+    {
+      "id": "4604",
+      "date": "2025-07-02T08:55:22.940Z",
+      "total": 245,
       "description": "",
       "status": "PENDING",
       "payment_method": "TRANSFER",
       "id_user": "5c35"
     },
     {
-      "id": "696f",
-      "date": "2025-07-01T03:59:25.059Z",
-      "total": 200,
-      "description": "tobita ",
-      "status": "PENDING",
+      "id": "41f0",
+      "date": "2025-07-02T08:55:33.497Z",
+      "total": 245,
+      "description": "",
+      "status": "PENDIENTE",
       "payment_method": "TRANSFER",
       "id_user": "5c35"
     },
     {
-      "id": "2d80",
-      "date": "2025-07-01T05:16:35.650Z",
+      "id": "93bf",
+      "date": "2025-07-02T09:00:49.897Z",
       "total": 80,
       "description": "",
+      "status": "PENDING",
+      "payment_method": "Cash",
+      "id_user": "5c35"
+    },
+    {
+      "id": "4917",
+      "date": "2025-07-02T09:16:42.259Z",
+      "total": 80,
+      "description": "",
+      "status": "PENDING",
+      "payment_method": "Cash",
+      "id_user": "5c35"
+    },
+    {
+      "id": "a280",
+      "date": "2025-07-02T09:25:13.312Z",
+      "total": 80,
+      "description": "4.1",
+      "status": "COMPLETED",
+      "payment_method": "TRANSFER",
+      "id_user": "5c35"
+    },
+    {
+      "id": "3ca2",
+      "date": "2025-07-02T09:32:28.757Z",
+      "total": 385,
+      "description": "4.2",
       "status": "COMPLETED",
       "payment_method": "CARD",
       "id_user": "5c35"
     },
     {
-      "id": "e4b9",
-      "date": "2025-07-01T19:24:21.945Z",
-      "total": 225,
-      "description": "",
-      "status": "PENDING",
-      "payment_method": "CARD",
-      "id_user": "5c35"
-    },
-    {
-      "id": "8034",
-      "date": "2025-07-01T22:42:37.516Z",
-      "total": 40,
-      "description": "equis",
-      "status": "PENDING",
-      "payment_method": "Transfer",
-      "id_user": "5c35"
-    },
-    {
-      "id": "d8e6",
-      "date": "2025-07-01T22:49:10.848Z",
-      "total": 40,
-      "description": "fe",
-      "status": "PENDING",
-      "payment_method": "Cash",
-      "id_user": "5c35"
-    },
-    {
-      "id": "eb66",
-      "date": "2025-07-01T22:51:51.252Z",
-      "total": 40,
-      "description": "",
-      "status": "PENDING",
-      "payment_method": "Cash",
-      "id_user": "5c35"
-    },
-    {
-      "id": "cd43",
-      "date": "2025-07-01T22:52:49.334Z",
-      "total": 40,
-      "description": "",
-      "status": "PENDING",
-      "payment_method": "Cash",
-      "id_user": "5c35"
-    },
-    {
-      "id": "107a",
-      "date": "2025-07-01T22:54:26.241Z",
-      "total": 40,
-      "description": "",
-      "status": "PENDING",
-      "payment_method": "Cash",
-      "id_user": "5c35"
-    },
-    {
-      "id": "8767",
-      "date": "2025-07-01T22:55:49.552Z",
+      "id": "967d",
+      "date": "2025-07-02T16:42:39.591Z",
       "total": 80,
-      "description": "",
-      "status": "PENDING",
-      "payment_method": "Cash",
+      "description": "4.5",
+      "status": "COMPLETED",
+      "payment_method": "CASH",
       "id_user": "5c35"
     },
     {
-      "id": "be54",
-      "date": "2025-07-01T23:40:01.713Z",
-      "total": 40,
-      "description": "",
-      "status": "PENDING",
-      "payment_method": "Cash",
-      "id_user": "5c35"
-    },
-    {
-      "id": "e8ce",
-      "date": "2025-07-02T00:09:09.674Z",
-      "total": 40,
-      "description": "",
-      "status": "PENDING",
-      "payment_method": "Cash",
-      "id_user": "5c35"
-    },
-    {
-      "id": "83f7",
-      "date": "2025-07-02T00:19:05.830Z",
-      "total": 40,
-      "description": "",
-      "status": "PENDING",
-      "payment_method": "Cash",
+      "id": "b39e",
+      "date": "2025-07-02T18:27:12.123Z",
+      "total": 120,
+      "description": "vgwogf",
+      "status": "COMPLETED",
+      "payment_method": "TRANSFER",
       "id_user": "5c35"
     }
   ],
@@ -336,136 +308,204 @@
       "amount": 2,
       "subtotal": 60,
       "id_product": "53c7",
-      "id_sale": 1,
+      "id_sale": "3b7e",
       "id": "5c75"
     },
     {
-      "id_sale_detail": 2,
-      "amount": 1,
-      "subtotal": 60,
-      "id_product": "287d",
-      "id_sale": 1,
-      "id": "f9d6"
-    },
-    {
-      "id": "100f",
+      "id": "0b27",
       "amount": 2,
       "subtotal": 80,
-      "id_product": "ab36"
+      "id_product": "53c7",
+      "id_sale": "5f1a"
     },
     {
-      "id": "270d",
+      "id": "c6e9",
       "amount": 1,
       "subtotal": 40,
-      "id_product": "5e13"
+      "id_product": "5e13",
+      "id_sale": "5f1a"
     },
     {
-      "id": "cf8d",
+      "id": "788d",
       "amount": 1,
       "subtotal": 40,
-      "id_product": "53c7"
+      "id_product": "53c7",
+      "id_sale": "ebc3"
     },
     {
-      "id": "33ae",
+      "id": "07be",
+      "amount": 1,
+      "subtotal": 45,
+      "id_product": "4b59",
+      "id_sale": "ebc3"
+    },
+    {
+      "id": "7793",
       "amount": 1,
       "subtotal": 40,
-      "id_product": "a4f3"
+      "id_product": "ab36",
+      "id_sale": "8520"
     },
     {
-      "id": "4e09",
+      "id": "e359",
       "amount": 1,
       "subtotal": 40,
-      "id_product": "ab36"
+      "id_product": "53c7",
+      "id_sale": "4604"
     },
     {
-      "id": "9b0a",
+      "id": "d84b",
       "amount": 1,
       "subtotal": 40,
-      "id_product": "53c7"
+      "id_product": "ab36",
+      "id_sale": "4604"
     },
     {
-      "id": "3825",
+      "id": "d74c",
+      "amount": 1,
+      "subtotal": 120,
+      "id_product": "287d",
+      "id_sale": "4604"
+    },
+    {
+      "id": "ef38",
+      "amount": 1,
+      "subtotal": 45,
+      "id_product": "f000",
+      "id_sale": "4604"
+    },
+    {
+      "id": "c3a6",
       "amount": 1,
       "subtotal": 40,
-      "id_product": "5e13"
+      "id_product": "53c7",
+      "id_sale": "41f0"
     },
     {
-      "id": "7751",
+      "id": "a9a5",
       "amount": 1,
       "subtotal": 40,
-      "id_product": "ab36"
+      "id_product": "ab36",
+      "id_sale": "41f0"
     },
     {
-      "id": "5737",
+      "id": "c792",
+      "amount": 1,
+      "subtotal": 120,
+      "id_product": "287d",
+      "id_sale": "41f0"
+    },
+    {
+      "id": "8e84",
+      "amount": 1,
+      "subtotal": 45,
+      "id_product": "f000",
+      "id_sale": "41f0"
+    },
+    {
+      "id": "9b1d",
       "amount": 1,
       "subtotal": 40,
-      "id_product": "53c7"
+      "id_product": "5e13",
+      "id_sale": "93bf"
     },
     {
-      "id": "0d54",
+      "id": "7ca2",
+      "amount": 1,
+      "subtotal": 40,
+      "id_product": "ab36",
+      "id_sale": "93bf"
+    },
+    {
+      "id": "25b7",
+      "amount": 1,
+      "subtotal": 40,
+      "id_product": "5e13",
+      "id_sale": "4917"
+    },
+    {
+      "id": "2453",
+      "amount": 1,
+      "subtotal": 40,
+      "id_product": "ab36",
+      "id_sale": "4917"
+    },
+    {
+      "id": "b1cc",
+      "amount": 1,
+      "subtotal": 40,
+      "id_product": "5e13",
+      "id_sale": "a280"
+    },
+    {
+      "id": "d4a2",
+      "amount": 1,
+      "subtotal": 40,
+      "id_product": "ab36",
+      "id_sale": "a280"
+    },
+    {
+      "id": "effa",
+      "amount": 1,
+      "subtotal": 40,
+      "id_product": "53c7",
+      "id_sale": "3ca2"
+    },
+    {
+      "id": "4f02",
+      "amount": 1,
+      "subtotal": 120,
+      "id_product": "287d",
+      "id_sale": "3ca2"
+    },
+    {
+      "id": "686b",
+      "amount": 1,
+      "subtotal": 45,
+      "id_product": "4b59",
+      "id_sale": "3ca2"
+    },
+    {
+      "id": "0b41",
+      "amount": 1,
+      "subtotal": 45,
+      "id_product": "6e3c",
+      "id_sale": "3ca2"
+    },
+    {
+      "id": "97ae",
       "amount": 3,
-      "subtotal": 105,
-      "id_product": "e8e5"
+      "subtotal": 135,
+      "id_product": "f000",
+      "id_sale": "3ca2"
     },
     {
-      "id": "f4ad",
+      "id": "72a0",
       "amount": 1,
       "subtotal": 40,
-      "id_product": "5e13"
+      "id_product": "53c7",
+      "id_sale": "967d"
     },
     {
-      "id": "ae21",
+      "id": "6724",
       "amount": 1,
       "subtotal": 40,
-      "id_product": "a4f3"
+      "id_product": "ab36",
+      "id_sale": "967d"
     },
     {
-      "id": "29ff",
+      "id": "7a0f",
       "amount": 1,
       "subtotal": 40,
-      "id_product": "a4f3"
+      "id_product": "53c7",
+      "id_sale": "b39e"
     },
     {
-      "id": "6200",
-      "amount": 1,
-      "subtotal": 40,
-      "id_product": "a4f3"
-    },
-    {
-      "id": "a01a",
-      "amount": 1,
-      "subtotal": 40,
-      "id_product": "a4f3"
-    },
-    {
-      "id": "e048",
-      "amount": 1,
-      "subtotal": 40,
-      "id_product": "a4f3"
-    },
-    {
-      "id": "b3d2",
-      "amount": 1,
-      "subtotal": 40,
-      "id_product": "31fa"
-    },
-    {
-      "id": "51ac",
-      "amount": 1,
-      "subtotal": 40,
-      "id_product": "a4f3"
-    },
-    {
-      "id": "f1fc",
-      "amount": 1,
-      "subtotal": 40,
-      "id_product": "5e13"
-    },
-    {
-      "id": "dcd4",
-      "amount": 1,
-      "subtotal": 40,
-      "id_product": "a4f3"
+      "id": "c708",
+      "amount": 2,
+      "subtotal": 80,
+      "id_product": "5e13",
+      "id_sale": "b39e"
     }
   ],
   "expense_category": [
@@ -589,51 +629,397 @@
   ],
   "accounts_receivable": [
     {
-      "id_accounts_receivable": 1,
-      "expiration_date": "2023-05-15",
+      "id": "bb3b",
+      "expiration_date": "2025-07-17",
       "id_sale": "696f"
     },
     {
-      "id_accounts_receivable": 2,
-      "expiration_date": "2023-06-20",
-      "id_sale": "eddf"
+      "id": "ef5c",
+      "expiration_date": "2025-07-17"
+    },
+    {
+      "id": "6a73",
+      "expiration_date": "2025-07-17"
+    },
+    {
+      "id": "a750",
+      "expiration_date": "2025-07-17"
+    },
+    {
+      "id": "964f",
+      "id_sale": "cbf0",
+      "expiration_date": "2025-07-17"
+    },
+    {
+      "id": "d7e4",
+      "id_sale": "9fb2",
+      "expiration_date": "2025-07-09"
+    },
+    {
+      "id": "8325",
+      "id_sale": "6e47",
+      "expiration_date": "2025-07-09"
+    },
+    {
+      "id": "afd0",
+      "id_sale": "4d9b",
+      "expiration_date": "2025-07-09"
+    },
+    {
+      "id": "f981",
+      "id_sale": "6071",
+      "expiration_date": "2025-07-09"
+    },
+    {
+      "id": "4cbd",
+      "id_sale": "2839",
+      "expiration_date": "2025-07-09"
+    },
+    {
+      "id": "8f3d",
+      "id_sale": "f745",
+      "expiration_date": "2025-07-09"
+    },
+    {
+      "id": "562a",
+      "id_sale": "8e17",
+      "expiration_date": "2025-07-09"
+    },
+    {
+      "id": "46b6",
+      "id_sale": "6c4f",
+      "expiration_date": "2025-07-09"
+    },
+    {
+      "id": "95ce",
+      "id_sale": "e04b",
+      "expiration_date": "2025-07-09"
+    },
+    {
+      "id": "e622",
+      "id_sale": "5f1a",
+      "expiration_date": "2025-07-09"
+    },
+    {
+      "id": "4f0b",
+      "id_sale": "ebc3",
+      "expiration_date": "2025-07-09"
+    },
+    {
+      "id": "0b70",
+      "id_sale": "93bf",
+      "expiration_date": "2025-07-09"
+    },
+    {
+      "id": "2cd5",
+      "id_sale": "4917",
+      "expiration_date": "2025-07-09"
+    },
+    {
+      "id": "7bf0",
+      "id_sale": "a280",
+      "expiration_date": "2025-07-09"
+    },
+    {
+      "id": "258b",
+      "id_sale": "3ca2",
+      "expiration_date": "2025-07-17"
+    },
+    {
+      "id": "6361",
+      "id_sale": "967d",
+      "expiration_date": "2025-07-17"
+    },
+    {
+      "id": "78d3",
+      "id_sale": "b39e",
+      "expiration_date": "2025-07-09"
     }
   ],
   "payment": [
     {
-      "id_payment": 1,
-      "payment_date": "2023-06-18",
-      "amount_paid": 150.75,
-      "payment_method": "TRANSFER",
-      "id_accounts_receivable": 2
+      "id": "49b6",
+      "id_accounts_receivable": "ef5c",
+      "amount_paid": 80,
+      "payment_date": "2025-07-02",
+      "payment_method": "Transfer"
     },
     {
-      "id_payment": 2,
-      "payment_date": "2023-07-05",
-      "amount_paid": 200,
-      "payment_method": "TRANSFER",
-      "id_accounts_receivable": 2
+      "id": "375f",
+      "id_accounts_receivable": "6a73",
+      "amount_paid": 10,
+      "payment_date": "2025-07-02",
+      "payment_method": "Cash"
     },
     {
-      "id_payment": 3,
-      "payment_date": "2023-07-20",
-      "amount_paid": 75.5,
+      "id": "9c0c",
+      "id_accounts_receivable": "a750",
+      "amount_paid": 5,
+      "payment_date": "2025-07-02",
+      "payment_method": "Cash"
+    },
+    {
+      "id": "0c8d",
+      "id_accounts_receivable": "964f",
+      "amount_paid": 5,
+      "payment_date": "2025-07-02",
+      "payment_method": "Transfer"
+    },
+    {
+      "id": "e67d",
+      "id_accounts_receivable": "d7e4",
+      "amount_paid": 4,
+      "payment_date": "2025-07-02",
+      "payment_method": "TRANSFER"
+    },
+    {
+      "id": "e26c",
+      "id_accounts_receivable": "8325",
+      "amount_paid": 6,
+      "payment_date": "2025-07-02",
+      "payment_method": "Cash"
+    },
+    {
+      "id": "3f93",
+      "id_accounts_receivable": "afd0",
+      "amount_paid": 7,
+      "payment_date": "2025-07-02",
+      "payment_method": "CASH"
+    },
+    {
+      "id": "b356",
+      "id_accounts_receivable": "f981",
+      "amount_paid": 3,
+      "payment_date": "2025-07-02",
+      "payment_method": "Cash"
+    },
+    {
+      "id": "e7aa",
+      "id_accounts_receivable": "4cbd",
+      "amount_paid": 4,
+      "payment_date": "2025-07-02",
+      "payment_method": "TRANSFER"
+    },
+    {
+      "id": "d3c4",
+      "id_accounts_receivable": "8f3d",
+      "amount_paid": 3,
+      "payment_date": "2025-07-02",
+      "payment_method": "CASH"
+    },
+    {
+      "id": "414f",
+      "id_accounts_receivable": "562a",
+      "amount_paid": 0.01,
+      "payment_date": "2025-07-02",
+      "payment_method": "CARD"
+    },
+    {
+      "id": "84d2",
+      "id_accounts_receivable": "46b6",
+      "amount_paid": 0.01,
+      "payment_date": "2025-07-02",
+      "payment_method": "Cash"
+    },
+    {
+      "id": "0bae",
+      "id_accounts_receivable": "95ce",
+      "amount_paid": 5,
+      "payment_date": "2025-07-02",
+      "payment_method": "CASH"
+    },
+    {
+      "id": "f4c6",
+      "id_accounts_receivable": "e622",
+      "amount_paid": 6,
+      "payment_date": "2025-07-02",
+      "payment_method": "CASH"
+    },
+    {
+      "id": "9703",
+      "id_accounts_receivable": "4f0b",
+      "amount_paid": 8,
+      "payment_date": "2025-07-02",
+      "payment_method": "CASH"
+    },
+    {
+      "id": "9adf",
+      "amount_paid": 5,
+      "payment_date": "2025-07-02",
+      "payment_method": "TRANSFER"
+    },
+    {
+      "id": "6949",
+      "amount_paid": 7,
+      "payment_date": "2025-07-02",
+      "payment_method": "CASH"
+    },
+    {
+      "id": "56b4",
+      "amount_paid": 7,
+      "payment_date": "2025-07-02",
+      "payment_method": "CASH"
+    },
+    {
+      "id": "2d93",
+      "id_accounts_receivable": "4f0b",
+      "amount_paid": 7,
+      "payment_date": "2025-07-02",
+      "payment_method": "CASH"
+    },
+    {
+      "id": "fa6b",
+      "id_accounts_receivable": "4f0b",
+      "amount_paid": 7,
+      "payment_date": "2025-07-02",
+      "payment_method": "CASH"
+    },
+    {
+      "id": "907a",
+      "id_accounts_receivable": "4f0b",
+      "amount_paid": 10,
+      "payment_date": "2025-07-02",
+      "payment_method": "TRANSFER"
+    },
+    {
+      "id": "b502",
+      "id_accounts_receivable": "e622",
+      "amount_paid": 14,
+      "payment_date": "2025-07-02",
+      "payment_method": "CASH"
+    },
+    {
+      "id": "0162",
+      "id_accounts_receivable": "4f0b",
+      "amount_paid": 0.01,
+      "payment_date": "2025-07-02",
+      "payment_method": "CASH"
+    },
+    {
+      "id": "3da9",
+      "id_accounts_receivable": "e622",
+      "amount_paid": 5,
+      "payment_date": "2025-07-02",
+      "payment_method": "TRANSFER"
+    },
+    {
+      "id": "c55d",
+      "id_accounts_receivable": "4f0b",
+      "amount_paid": 52.99,
+      "payment_date": "2025-07-02",
+      "payment_method": "CASH"
+    },
+    {
+      "id": "8a99",
+      "id_accounts_receivable": "e622",
+      "amount_paid": 95,
+      "payment_date": "2025-07-02",
+      "payment_method": "CASH"
+    },
+    {
+      "id": "1944",
+      "id_accounts_receivable": "0b70",
+      "amount_paid": 10,
+      "payment_date": "2025-07-02",
+      "payment_method": "Cash"
+    },
+    {
+      "id": "fb19",
+      "id_accounts_receivable": "0b70",
+      "amount_paid": 70,
+      "payment_date": "2025-07-02",
+      "payment_method": "TRANSFER"
+    },
+    {
+      "id": "5401",
+      "id_accounts_receivable": "2cd5",
+      "amount_paid": 2,
+      "payment_date": "2025-07-02",
+      "payment_method": "Cash"
+    },
+    {
+      "id": "e149",
+      "id_accounts_receivable": "2cd5",
+      "amount_paid": 78,
+      "payment_date": "2025-07-02",
+      "payment_method": "TRANSFER"
+    },
+    {
+      "id": "7b17",
+      "id_accounts_receivable": "7bf0",
+      "amount_paid": 5,
+      "payment_date": "2025-07-02",
+      "payment_method": "TRANSFER"
+    },
+    {
+      "id": "04cb",
+      "id_accounts_receivable": "7bf0",
+      "amount_paid": 75,
       "payment_method": "CASH",
-      "id_accounts_receivable": 2
+      "payment_date": "2025-07-02"
     },
     {
-      "id_payment": 4,
-      "payment_date": "2023-08-01",
-      "amount_paid": 120,
+      "id": "31af",
+      "id_accounts_receivable": "258b",
+      "amount_paid": 85,
+      "payment_date": "2025-07-02",
+      "payment_method": "CARD"
+    },
+    {
+      "id": "e160",
+      "id_accounts_receivable": "258b",
+      "amount_paid": 50,
+      "payment_method": "CASH",
+      "payment_date": "2025-07-02"
+    },
+    {
+      "id": "40d4",
+      "id_accounts_receivable": "258b",
+      "amount_paid": 250,
+      "payment_method": "TRANSFER",
+      "payment_date": "2025-07-02"
+    },
+    {
+      "id": "feb5",
+      "id_accounts_receivable": "6361",
+      "amount_paid": 10,
+      "payment_date": "2025-07-02",
+      "payment_method": "CASH"
+    },
+    {
+      "id": "0781",
+      "id_accounts_receivable": "6361",
+      "amount_paid": 5,
       "payment_method": "CARD",
-      "id_accounts_receivable": 1
+      "payment_date": "2025-07-02"
     },
     {
-      "id_payment": 5,
-      "payment_date": "2023-08-10",
-      "amount_paid": 300.25,
+      "id": "1362",
+      "id_accounts_receivable": "6361",
+      "amount_paid": 65,
       "payment_method": "CASH",
-      "id_accounts_receivable": 2
+      "payment_date": "2025-07-02"
+    },
+    {
+      "id": "29f2",
+      "id_accounts_receivable": "78d3",
+      "amount_paid": 20,
+      "payment_date": "2025-07-02",
+      "payment_method": "TRANSFER"
+    },
+    {
+      "id": "031a",
+      "id_accounts_receivable": "78d3",
+      "amount_paid": 50,
+      "payment_method": "CARD",
+      "payment_date": "2025-07-02"
+    },
+    {
+      "id": "83d3",
+      "id_accounts_receivable": "78d3",
+      "amount_paid": 50,
+      "payment_method": "TRANSFER",
+      "payment_date": "2025-07-02"
     }
   ]
 }

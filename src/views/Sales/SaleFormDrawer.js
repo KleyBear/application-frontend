@@ -67,13 +67,12 @@ const SaleFormDrawer = ({ visible, onClose, selectedProducts, setSelectedProduct
             amount: product.amount,
             subtotal: product.subtotal,
             id_product: product.id,
-            id_sale: newSale.id_sale,
+            id_sale: newSale.id,
           }),
         })
       }
 
       setSavedSaleData(newSale)
-
       if (status === 'PENDING') {
         setShowAccountReceivableModal(true)
       } else {
@@ -98,10 +97,8 @@ const SaleFormDrawer = ({ visible, onClose, selectedProducts, setSelectedProduct
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          id_sale: savedSaleData.id_sale,
+          id_sale: savedSaleData.id,
           expiration_date: data.expiration_date,
-          amount_paid: data.amount_paid,
-          payment_date: data.payment_date,
         }),
       })
 
@@ -139,26 +136,26 @@ const SaleFormDrawer = ({ visible, onClose, selectedProducts, setSelectedProduct
                   <CFormCheck
                     type="radio"
                     name="payment"
-                    label="CASH"
-                    value="Cash"
-                    checked={paymentMethod === 'Cash'}
-                    onChange={() => setPaymentMethod('Cash')}
+                    label="💵CASH"
+                    value="CASH"
+                    checked={paymentMethod === 'CASH'}
+                    onChange={() => setPaymentMethod('CASH')}
                   />
                   <CFormCheck
                     type="radio"
                     name="payment"
-                    label="TRANSFER"
-                    value="Transfer"
-                    checked={paymentMethod === 'Transfer'}
-                    onChange={() => setPaymentMethod('Transfer')}
+                    label="🏦TRANSFER"
+                    value="TRANSFER"
+                    checked={paymentMethod === 'TRANSFER'}
+                    onChange={() => setPaymentMethod('TRANSFER')}
                   />
                   <CFormCheck
                     type="radio"
                     name="payment"
-                    label="CARD"
-                    value="Card"
-                    checked={paymentMethod === 'Card'}
-                    onChange={() => setPaymentMethod('Card')}
+                    label="💳CARD"
+                    value="CARD"
+                    checked={paymentMethod === 'CARD'}
+                    onChange={() => setPaymentMethod('CARD')}
                   />
                 </CAccordionBody>
               </CAccordionItem>
@@ -219,11 +216,11 @@ const SaleFormDrawer = ({ visible, onClose, selectedProducts, setSelectedProduct
           </CForm>
         </COffcanvasBody>
       </COffcanvas>
-
       <FormAccountReceivable
         visible={showAccountReceivableModal}
         onClose={() => setShowAccountReceivableModal(false)}
         onSave={handleAccountReceivableSave}
+        sale={savedSaleData}
       />
     </>
   )

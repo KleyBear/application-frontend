@@ -16,6 +16,7 @@ import {
   CRow,
   CCol,
 } from '@coreui/react'
+import ModalPayPayment from './ModalPayAccountReceivable.js'
 
 const AccountReceivable = () => {
   const [salesWithDetails, setSalesWithDetails] = useState([])
@@ -32,6 +33,19 @@ const AccountReceivable = () => {
 
   const [roles, setRoles] = useState([])
 
+  const [modalVisible, setModalVisible] = useState(false)
+  const [selectedSale, setSelectedSale] = useState(null)
+
+  const openModal = (sale) => {
+    setSelectedSale(sale)
+    setModalVisible(true)
+  }
+
+  const closeModal = () => {
+    setModalVisible(false)
+    setSelectedSale(null)
+  }
+
   const PaymentMethodEnum = {
     CASH: 'CASH',
     TRANSFER: 'TRANSFER',
@@ -44,33 +58,32 @@ const AccountReceivable = () => {
     [PaymentMethodEnum.CARD]: { label: 'Tarjeta 🧾', color: 'text-danger' },
   }
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [saleRes, userRes, roleRes, accountRes, paymentRes] = await Promise.all([
-          fetch('http://localhost:8000/sale'),
-          fetch('http://localhost:8000/user'),
-          fetch('http://localhost:8000/role'),
-          fetch('http://localhost:8000/accounts_receivable'),
-          fetch('http://localhost:8000/payment'),
-        ])
+  const fetchData = async () => {
+    try {
+      const [saleRes, userRes, roleRes, accountRes, paymentRes] = await Promise.all([
+        fetch('http://localhost:8000/sale'),
+        fetch('http://localhost:8000/user'),
+        fetch('http://localhost:8000/role'),
+        fetch('http://localhost:8000/accounts_receivable'),
+        fetch('http://localhost:8000/payment'),
+      ])
 
-        const [sales, users, rolesData, accounts, payments] = await Promise.all([
-          saleRes.json(),
-          userRes.json(),
-          roleRes.json(),
-          accountRes.json(),
-          paymentRes.json(),
-        ])
+      const [sales, users, rolesData, accounts, payments] = await Promise.all([
+        saleRes.json(),
+        userRes.json(),
+        roleRes.json(),
+        accountRes.json(),
+        paymentRes.json(),
+      ])
 
-        const combined = sales.map((sale) => {
+      const combined = sales
+        .map((sale) => {
           const accountReceivable = accounts.find((acc) => acc.id_sale === sale.id)
+          if (!accountReceivable) return null // Excluir si no hay cuenta por cobrar
 
-          const relatedPayments = accountReceivable
-            ? payments.filter(
-                (p) => p.id_accounts_receivable === accountReceivable.id_accounts_receivable,
-              )
-            : []
+          const relatedPayments = payments.filter(
+            (p) => p.id_accounts_receivable === accountReceivable.id,
+          )
 
           const paidAmount = relatedPayments.reduce((sum, p) => sum + p.amount_paid, 0)
           const pendingAmount = sale.total - paidAmount
@@ -90,16 +103,18 @@ const AccountReceivable = () => {
             pendingAmount,
           }
         })
+        .filter((sale) => sale !== null) // eliminar los que no tengan cuenta por cobrar
 
-        setSalesWithDetails(combined)
-        setFilteredSales(combined)
-        setRoles(rolesData)
-        setLoading(false)
-      } catch (error) {
-        console.error('Error cargando datos', error)
-      }
+      setSalesWithDetails(combined)
+      setFilteredSales(combined)
+      setRoles(rolesData)
+      setLoading(false)
+    } catch (error) {
+      console.error('Error cargando datos', error)
     }
+  }
 
+  useEffect(() => {
     fetchData()
   }, [])
 
@@ -228,78 +243,122 @@ const AccountReceivable = () => {
             {filteredSales.length === 0 && (
               <p className="text-center">No se encontraron ventas con esos filtros.</p>
             )}
-            {filteredSales.map((sale) => {
-              const isActive = activeKey === sale.id
-              return (
-                <CAccordionItem
-                  key={sale.id}
-                  itemKey={sale.id}
-                  // No pasar onClick aquí para evitar que se pase a DOM nativo
-                  style={{
-                    borderRadius: '12px',
-                    marginBottom: '10px',
-                    boxShadow: isActive ? '0 0 15px rgba(141, 101, 252, 0.4)' : 'none',
-                    transition: 'all 0.3s ease',
-                  }}
-                >
-                  <CAccordionHeader
-                    onClick={() => handleToggle(sale.id)}
+            {filteredSales
+              .sort((a, b) => new Date(b.date) - new Date(a.date)) // Ordenar por fecha descendente
+              .map((sale, index) => {
+                const isActive = activeKey === sale.id
+                return (
+                  <CAccordionItem
+                    key={sale.id}
+                    itemKey={sale.id}
                     style={{
-                      borderRadius: '12px 12px 0 0',
-                      padding: '1rem',
+                      borderRadius: '12px',
+                      marginBottom: '10px',
+                      boxShadow: isActive ? '0 0 15px rgba(141, 101, 252, 0.4)' : 'none',
+                      transition: 'all 0.3s ease',
                     }}
                   >
-                    <div className="d-flex flex-column">
-                      <small className={isActive ? 'text-dark' : 'text-white'}>
-                        Total: ${sale.total.toFixed(2)} — Vence:{' '}
-                        {sale.accountReceivable?.expiration_date || 'N/A'}
-                      </small>
-                    </div>
-                  </CAccordionHeader>
-                  <CAccordionBody
-                    style={{
-                      borderTop: 'none',
-                      borderRadius: '0 0 12px 12px',
-                      padding: '1rem',
-                    }}
-                  >
-                    <h6>Abonos realizados:</h6>
-                    <ul className="list-group mb-3">
-                      {sale.relatedPayments.length > 0 ? (
-                        sale.relatedPayments.map((payment) => (
-                          <li
-                            key={payment.id_payment}
-                            className="list-group-item d-flex justify-content-between align-items-center"
-                          >
-                            <span className={paymentMethodLabels[payment.payment_method]?.color}>
-                              {paymentMethodLabels[payment.payment_method]?.label ||
-                                payment.payment_method}
-                            </span>
-                            <span>
-                              ${payment.amount_paid.toFixed(2)} — {payment.payment_date}
-                            </span>
+                    <CAccordionHeader
+                      onClick={() => handleToggle(sale.id)}
+                      style={{
+                        borderRadius: '12px 12px 0 0',
+                        padding: '1rem',
+                      }}
+                    >
+                      <div className="d-flex justify-content-between align-items-center w-100">
+                        <div className="d-flex flex-column">
+                          <strong className={isActive ? 'text-dark' : 'text-white'}>
+                            Venta #{index + 1}
+                          </strong>
+                          <small className={isActive ? 'text-dark' : 'text-white'}>
+                            Total: ${sale.total.toFixed(2)} — Vence:{' '}
+                            {sale.accountReceivable?.expiration_date || 'N/A'}
+                          </small>
+                          <small className={isActive ? 'text-dark' : 'text-white'}>
+                            {sale.description}
+                          </small>
+                        </div>
+                        <button
+                          style={{
+                            background: 'linear-gradient(90deg, #D13FFF 0%, rgb(80, 77, 255) 100%)',
+                            border: 'none',
+                            color: 'white',
+                            borderRadius: '25px',
+                            padding: '6px 12px',
+                            fontWeight: 'bold',
+                            cursor: 'pointer',
+                            whiteSpace: 'nowrap',
+                            fontSize: '0.9rem',
+                            marginRight: '10px',
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            openModal(sale)
+                          }}
+                        >
+                          Pay
+                        </button>
+                      </div>
+                    </CAccordionHeader>
+
+                    <CAccordionBody
+                      style={{
+                        borderTop: 'none',
+                        borderRadius: '0 0 12px 12px',
+                        padding: '1rem',
+                      }}
+                    >
+                      <h6>Abonos realizados:</h6>
+                      <ul className="list-group mb-3">
+                        {sale.relatedPayments.length > 0 ? (
+                          sale.relatedPayments.map((payment) => (
+                            <li
+                              key={payment.id}
+                              className="list-group-item d-flex justify-content-between align-items-center"
+                            >
+                              <span className={paymentMethodLabels[payment.payment_method]?.color}>
+                                {paymentMethodLabels[payment.payment_method]?.label ||
+                                  payment.payment_method}
+                              </span>
+                              <span>
+                                ${payment.amount_paid.toFixed(2)} — {payment.payment_date}
+                              </span>
+                            </li>
+                          ))
+                        ) : (
+                          <li className="list-group-item text-muted">
+                            No se han realizado abonos.
                           </li>
-                        ))
-                      ) : (
-                        <li className="list-group-item text-muted">No se han realizado abonos.</li>
-                      )}
-                    </ul>
+                        )}
+                      </ul>
 
-                    <p>
-                      <strong>Monto pendiente:</strong>{' '}
-                      <span className="text-danger">${sale.pendingAmount.toFixed(2)}</span>
-                    </p>
+                      <p>
+                        <strong>Monto pendiente:</strong>{' '}
+                        <span className="text-danger">${sale.pendingAmount.toFixed(2)}</span>
+                      </p>
 
-                    <hr />
+                      <hr />
 
-                    <p>
-                      <strong>Total:</strong> ${sale.total.toFixed(2)}
-                    </p>
-                  </CAccordionBody>
-                </CAccordionItem>
-              )
-            })}
+                      <p>
+                        <strong>Total:</strong> ${sale.total.toFixed(2)}
+                      </p>
+                    </CAccordionBody>
+                  </CAccordionItem>
+                )
+              })}
           </CAccordion>
+        )}
+
+        {modalVisible && (
+          <ModalPayPayment
+            visible={modalVisible}
+            onClose={closeModal}
+            accountReceivableId={selectedSale.accountReceivable?.id}
+            onPaymentSaved={() => {
+              fetchData()
+              closeModal()
+            }}
+          />
         )}
       </CCardBody>
     </CCard>

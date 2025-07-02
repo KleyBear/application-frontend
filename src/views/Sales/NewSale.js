@@ -51,22 +51,25 @@ const NewSale = () => {
     return all.filter((p) => p.description.toLowerCase().includes(searchQuery.toLowerCase()))
   }
 
-  // FUNCION para agregar producto al carrito
   const addProductToCart = (product) => {
+    const price = parseFloat(product.price_sale) // Asegurarse que es número
+
     setSelectedProducts((prev) => {
       const index = prev.findIndex((p) => p.id === product.id)
+
       if (index !== -1) {
         // Ya existe: aumenta cantidad y subtotal
         const updated = [...prev]
         updated[index].amount += 1
-        updated[index].subtotal = updated[index].amount * updated[index].price_sale
+        updated[index].subtotal = updated[index].amount * price
         return updated
       } else {
         // Nuevo producto con cantidad 1 y subtotal igual al precio
-        return [...prev, { ...product, amount: 1, subtotal: product.price_sale }]
+        return [...prev, { ...product, price_sale: price, amount: 1, subtotal: price }]
       }
     })
-    setDrawerVisible(true) // Abrir drawer al añadir producto
+
+    setDrawerVisible(true)
   }
 
   return (
