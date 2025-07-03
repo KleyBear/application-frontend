@@ -1105,5 +1105,42 @@
       "payment_date": "2025-07-02",
       "payment_method": "CASH"
     }
+  ],
+  "investment": [
+    {
+      "id_investment": 1,
+      "date": "2025-07-01",
+      "total": 250,
+      "id_provider": 2
+    },
+    {
+      "id_investment": 2,
+      "date": "2025-07-02",
+      "total": 180.5,
+      "id_provider": 4
+    }
+  ],
+  "investment_detail": [
+    {
+      "id_investment_detail": 1,
+      "amount": 5,
+      "subtotal": 100,
+      "id_product": "53c7",
+      "id_investment": 1
+    },
+    {
+      "id_investment_detail": 2,
+      "amount": 3,
+      "subtotal": 150,
+      "id_product": "6e3c",
+      "id_investment": 1
+    },
+    {
+      "id_investment_detail": 3,
+      "amount": 2,
+      "subtotal": 80.5,
+      "id_product": "a4f3",
+      "id_investment": 2
+    }
   ]
 }
