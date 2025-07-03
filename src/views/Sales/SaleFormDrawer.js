@@ -15,14 +15,15 @@ import {
   CAccordionBody,
   CFormCheck,
 } from '@coreui/react'
-import FormAccountReceivable from 'src/views/Sales/formAccountReceivable.js' // Ajusta ruta según estructura
+import FormAccountReceivable from 'src/views/Sales/formAccountReceivable.js'
 
 const SaleFormDrawer = ({ visible, onClose, selectedProducts, setSelectedProducts }) => {
   const [status, setStatus] = useState('PENDING')
   const [description, setDescription] = useState('')
-  const [paymentMethod, setPaymentMethod] = useState('Cash') // default
+  const [paymentMethod, setPaymentMethod] = useState('Cash')
   const [showAccountReceivableModal, setShowAccountReceivableModal] = useState(false)
   const [savedSaleData, setSavedSaleData] = useState(null)
+  const [errorMessage, setErrorMessage] = useState('')
 
   const handleQuantityChange = (index, newQty) => {
     const updated = [...selectedProducts]
@@ -34,8 +35,10 @@ const SaleFormDrawer = ({ visible, onClose, selectedProducts, setSelectedProduct
   const total = selectedProducts.reduce((acc, p) => acc + p.subtotal, 0)
 
   const handleSave = async () => {
+    setErrorMessage('')
+
     if (selectedProducts.length === 0) {
-      alert('No hay productos en el carrito.')
+      setErrorMessage('No hay productos en el carrito.')
       return
     }
 
@@ -80,7 +83,8 @@ const SaleFormDrawer = ({ visible, onClose, selectedProducts, setSelectedProduct
         onClose()
       }
     } catch (error) {
-      alert('Error al guardar la venta: ' + error.message)
+      console.error('Error al guardar la venta:', error)
+      setErrorMessage('Ocurrió un error al guardar la venta. Intente nuevamente.')
     }
   }
 
@@ -89,6 +93,7 @@ const SaleFormDrawer = ({ visible, onClose, selectedProducts, setSelectedProduct
     setDescription('')
     setStatus('PENDING')
     setPaymentMethod('Cash')
+    setErrorMessage('')
   }
 
   const handleAccountReceivableSave = async (data) => {
@@ -108,7 +113,8 @@ const SaleFormDrawer = ({ visible, onClose, selectedProducts, setSelectedProduct
       setShowAccountReceivableModal(false)
       onClose()
     } catch (error) {
-      alert('Error al guardar la cuenta por cobrar: ' + error.message)
+      console.error('Error al guardar la cuenta por cobrar:', error)
+      setErrorMessage('No se pudo guardar la cuenta por cobrar.')
     }
   }
 
@@ -120,6 +126,10 @@ const SaleFormDrawer = ({ visible, onClose, selectedProducts, setSelectedProduct
         </COffcanvasHeader>
         <COffcanvasBody>
           <CForm>
+            {errorMessage && (
+              <div className="text-danger fw-semibold mb-3">{errorMessage}</div>
+            )}
+
             <CFormInput
               type="text"
               label="Descripción"
@@ -216,6 +226,7 @@ const SaleFormDrawer = ({ visible, onClose, selectedProducts, setSelectedProduct
           </CForm>
         </COffcanvasBody>
       </COffcanvas>
+
       <FormAccountReceivable
         visible={showAccountReceivableModal}
         onClose={() => setShowAccountReceivableModal(false)}

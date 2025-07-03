@@ -24,8 +24,10 @@ import CIcon from '@coreui/icons-react'
 import { cilPhone, cilPlus, cilTrash, cilPencil } from '@coreui/icons'
 import useFetch from '../../hooks/useFetch'
 
+const API_BASE = 'http://localhost:4000/api'
+
 const Suppliers = () => {
-  const { data: suppliers, loading, error } = useFetch('http://localhost:8000/supplier')
+  const { data: suppliers, loading, error } = useFetch(`${API_BASE}/providers`)
   const [localSuppliers, setLocalSuppliers] = useState([])
   const [products, setProducts] = useState([])
 
@@ -39,7 +41,6 @@ const Suppliers = () => {
   const [newSupplierProducts, setNewSupplierProducts] = useState([])
 
   const [showDeleteSupplierModal, setShowDeleteSupplierModal] = useState(false)
-  // Cambié para que guarde ambos ids
   const [supplierToDelete, setSupplierToDelete] = useState(null)
 
   const [newProductsInModal, setNewProductsInModal] = useState([])
@@ -51,27 +52,23 @@ const Suppliers = () => {
   }, [suppliers])
 
   useEffect(() => {
-    fetch('http://localhost:8000/product')
-      .then((res) => res.json())
+    fetch(`${API_BASE}/products`)
+      .then(async (res) => {
+        if (!res.ok) throw new Error('Error cargando productos')
+        return res.json()
+      })
       .then(setProducts)
-      .catch((err) => console.error('Error cargando productos', err))
+      .catch((err) => console.error('Error cargando productos', err.message))
   }, [])
 
   const supplierProducts = selectedSupplier
     ? products.filter((p) => p.id_supplier === selectedSupplier.id_suppliers)
     : []
 
-  const handleShowProducts = (supplier) => {
-    setSelectedSupplier(supplier)
-    setShowProductsModal(true)
-    setEditMode(false)
-    setNewProductsInModal([])
-  }
-
   const handleCostPriceChange = async (productId, newPrice) => {
     if (newPrice < 1) return
     try {
-      await fetch(`http://localhost:8000/product/${productId}`, {
+      await fetch(`${API_BASE}/products/${productId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cost_price: newPrice }),
@@ -87,7 +84,7 @@ const Suppliers = () => {
   const handleDeleteProduct = async (productId) => {
     if (!window.confirm('¿Estás seguro de eliminar este producto?')) return
     try {
-      await fetch(`http://localhost:8000/product/${productId}`, { method: 'DELETE' })
+      await fetch(`${API_BASE}/products/${productId}`, { method: 'DELETE' })
       setProducts((prev) => prev.filter((p) => p.id !== productId))
     } catch (err) {
       console.error('Error eliminando producto', err)
@@ -123,7 +120,7 @@ const Suppliers = () => {
         }
       }
       for (const prod of newProductsInModal) {
-        const response = await fetch('http://localhost:8000/product', {
+        const response = await fetch(`${API_BASE}/products`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(prod),
@@ -143,7 +140,7 @@ const Suppliers = () => {
     try {
       const newIdSupplier = Date.now()
 
-      const resSupplier = await fetch('http://localhost:8000/supplier', {
+      const resSupplier = await fetch(`${API_BASE}/providers`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -152,6 +149,9 @@ const Suppliers = () => {
           number: newSupplierNumber.trim(),
         }),
       })
+
+      if (!resSupplier.ok) throw new Error('No se pudo crear el proveedor')
+
       const createdSupplier = await resSupplier.json()
 
       for (const prod of newSupplierProducts) {
@@ -159,20 +159,16 @@ const Suppliers = () => {
           ...prod,
           id_supplier: newIdSupplier,
         }
-        await fetch('http://localhost:8000/product', {
+        await fetch(`${API_BASE}/products`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(productToSave),
         })
       }
 
-      // Recargar productos para que aparezcan en el modal al abrir
-      await fetch('http://localhost:8000/product')
-        .then((res) => res.json())
-        .then(setProducts)
+      await fetch(`${API_BASE}/products`).then((res) => res.json()).then(setProducts)
 
       setLocalSuppliers((prev) => [...prev, createdSupplier])
-
       setNewSupplierName('')
       setNewSupplierNumber('')
       setNewSupplierProducts([])
@@ -201,29 +197,19 @@ const Suppliers = () => {
     setNewSupplierProducts((prev) => prev.filter((_, i) => i !== index))
   }
 
-  // Ahora recibe el objeto completo y guarda ambos ids para manejar ambos casos
   const handleDeleteSupplier = (supplier) => {
-    setSupplierToDelete({
-      id_suppliers: supplier.id_suppliers,
-      id: supplier.id,
-    })
+    setSupplierToDelete({ id_suppliers: supplier.id_suppliers, id: supplier.id })
     setShowDeleteSupplierModal(true)
   }
 
   const confirmDeleteSupplier = async () => {
     try {
-      // Prioriza eliminar por id (que es el que json-server maneja), si no existe, usa id_suppliers
       const idToDelete = supplierToDelete.id ?? supplierToDelete.id_suppliers
-
-      await fetch(`http://localhost:8000/supplier/${idToDelete}`, {
+      await fetch(`${API_BASE}/providers/${idToDelete}`, {
         method: 'DELETE',
       })
-
-      // Actualiza el estado local eliminando el proveedor con cualquiera de los dos ids
       setLocalSuppliers((prev) =>
-        prev.filter(
-          (s) => s.id !== idToDelete && s.id_suppliers !== idToDelete
-        ),
+        prev.filter((s) => s.id !== idToDelete && s.id_suppliers !== idToDelete)
       )
     } catch (err) {
       console.error('Error eliminando proveedor', err)
@@ -232,7 +218,6 @@ const Suppliers = () => {
       setSupplierToDelete(null)
     }
   }
-
   return (
     <>
       <CRow>

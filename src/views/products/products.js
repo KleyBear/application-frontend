@@ -28,25 +28,32 @@ import { cilOptions } from '@coreui/icons'
 const Products = () => {
   const [categories, setCategories] = useState([])
   const navigate = useNavigate()
-  const { data } = useFetch('http://localhost:8000/category')
+  const { data } = useFetch('http://localhost:4000/api/category')
 
-  // Estados para modal de agregar categoría
   const [visibleCategoryAdd, setVisibleCategoryAdd] = useState(false)
   const [addCategoryFormData, setAddCategoryFormData] = useState({
-    name_category: '',
+    name: '',
     image: '',
   })
 
-  // Estados para edición
   const [selectedCategory, setSelectedCategory] = useState(null)
-  const [editFormData, setEditFormData] = useState({ name_category: '', image: '' })
+  const [editFormData, setEditFormData] = useState({ name: '', image: '' })
   const [visibleEditModal, setVisibleEditModal] = useState(false)
 
   useEffect(() => {
-    if (data) {
-      setCategories(data) // Actualiza las categorías con los datos obtenidos de la API
+  console.log('Datos recibidos:', data)
+  if (data) {
+    if (Array.isArray(data)) {
+      setCategories(data)
+    } else if (data.data && Array.isArray(data.data)) {
+      setCategories(data.data)
+    } else {
+      console.error('La estructura de data no es válida:', data)
+      setCategories([])
     }
-  }, [data])
+  }
+}, [data])
+
 
   const handleAddCategoryFormChange = (e) => {
     setAddCategoryFormData({
@@ -55,22 +62,18 @@ const Products = () => {
     })
   }
 
-  // Función para agregar categoría
   const handleAddCategory = async () => {
     try {
-      const response = await fetch('http://localhost:8000/category', {
+      const response = await fetch('http://localhost:4000/api/category', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(addCategoryFormData),
       })
-      if (!response.ok) {
-        throw new Error('Error al agregar la categoría')
-      }
+      if (!response.ok) throw new Error('Error al agregar la categoría')
       const newCategory = await response.json()
-      // Actualiza el state para incluir la nueva categoría:
-      setCategories((prevCategories) => [...prevCategories, newCategory])
+      setCategories((prev) => [...prev, newCategory])
       alert('Categoría agregada correctamente')
       setVisibleCategoryAdd(false)
     } catch (error) {
@@ -79,29 +82,25 @@ const Products = () => {
     }
   }
 
-  // Función para editar categoría (abrir modal de edición)
   const handleEditCategory = (category) => {
     setSelectedCategory(category)
-    setEditFormData({ name_category: category.name_category, image: category.image })
+    setEditFormData({ name: category.name, image: category.image })
     setVisibleEditModal(true)
   }
 
-  // Función para actualizar la categoría
   const handleUpdate = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/category/${selectedCategory.id}`, {
+      const response = await fetch(`http://localhost:4000/api/category/${selectedCategory.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(editFormData),
       })
-      if (!response.ok) {
-        throw new Error('Error al actualizar la categoría')
-      }
+      if (!response.ok) throw new Error('Error al actualizar la categoría')
       const updatedCategory = await response.json()
-      const updatedCategories = categories.map((category) =>
-        category.id === selectedCategory.id ? updatedCategory : category,
+      const updatedCategories = categories.map((cat) =>
+        cat.id === selectedCategory.id ? updatedCategory : cat,
       )
       setCategories(updatedCategories)
       setVisibleEditModal(false)
@@ -113,14 +112,11 @@ const Products = () => {
 
   const handleDeleteCategory = async (categoryId) => {
     try {
-      const response = await fetch(`http://localhost:8000/category/${categoryId}`, {
+      const response = await fetch(`http://localhost:4000/api/category/${categoryId}`, {
         method: 'DELETE',
       })
-      if (!response.ok) {
-        throw new Error('Error al eliminar usuario')
-      }
-      const updatedCategories = categories.filter((category) => category.id !== categoryId)
-      setCategories(updatedCategories)
+      if (!response.ok) throw new Error('Error al eliminar usuario')
+      setCategories(categories.filter((cat) => cat.id !== categoryId))
     } catch (error) {
       console.error(error)
       alert('Error eliminando el usuario')
@@ -140,16 +136,14 @@ const Products = () => {
                 <CFormLabel>Nombre de la Categoría</CFormLabel>
                 <CFormInput
                   type="text"
-                  name="name_category"
-                  placeholder="Nombre de la Categoría"
-                  value={addCategoryFormData.name_category}
+                  name="name"
+                  value={addCategoryFormData.name}
                   onChange={handleAddCategoryFormChange}
                 />
                 <CFormLabel>Imagen</CFormLabel>
                 <CFormInput
                   type="text"
                   name="image"
-                  placeholder=""
                   value={addCategoryFormData.image}
                   onChange={handleAddCategoryFormChange}
                 />
@@ -174,20 +168,16 @@ const Products = () => {
                 <CFormLabel>Nombre de la Categoría</CFormLabel>
                 <CFormInput
                   type="text"
-                  name="name_category"
-                  value={editFormData.name_category}
-                  onChange={(e) =>
-                    setEditFormData({ ...editFormData, [e.target.name]: e.target.value })
-                  }
+                  name="name"
+                  value={editFormData.name}
+                  onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
                 />
                 <CFormLabel>Imagen</CFormLabel>
                 <CFormInput
                   type="text"
                   name="image"
                   value={editFormData.image}
-                  onChange={(e) =>
-                    setEditFormData({ ...editFormData, [e.target.name]: e.target.value })
-                  }
+                  onChange={(e) => setEditFormData({ ...editFormData, image: e.target.value })}
                 />
               </CForm>
             </CModalBody>
@@ -201,6 +191,7 @@ const Products = () => {
             </CModalFooter>
           </CModal>
         </div>
+
         <CCardHeader>
           <CButton
             color="success"
@@ -210,55 +201,45 @@ const Products = () => {
             Add Category
           </CButton>
         </CCardHeader>
+
         <CCardBody>
           <CRow>
-            {categories.map((category) => (
-              <CCol sm="6" md="4" lg="3" key={category.id} className="mb-4">
-                <CCard>
-                  <div style={{ position: 'relative' }}>
-                    <CCardImage
-                      orientation="top"
-                      src={category.image || 'https://via.placeholder.com/150'}
-                      alt={category.name_category}
-                    />
-                    {/* Menú de opciones en la esquina superior derecha */}
-                    <div
-                      style={{
-                        position: 'absolute',
-                        top: '5px',
-                        right: '5px',
-                        zIndex: 10,
-                      }}
-                    >
-                      <CDropdown>
-                        <CDropdownToggle color="link" size="sm" caret={false}>
-                          <CIcon icon={cilOptions} />
-                        </CDropdownToggle>
-                        <CDropdownMenu>
-                          <CDropdownItem onClick={() => handleEditCategory(category)}>
-                            Editar
-                          </CDropdownItem>
-                          <CDropdownItem onClick={() => handleDeleteCategory(category.id)}>
-                            Eliminar
-                          </CDropdownItem>
-                        </CDropdownMenu>
-                      </CDropdown>
+            {Array.isArray(categories) &&
+              categories.map((category) => (
+                <CCol sm="6" md="4" lg="3" key={category.id} className="mb-4">
+                  <CCard>
+                    <div style={{ position: 'relative' }}>
+                      <CCardImage
+                        orientation="top"
+                        src={category.image || 'https://via.placeholder.com/150'}
+                        alt={category.name}
+                      />
+                      <div style={{ position: 'absolute', top: '5px', right: '5px', zIndex: 10 }}>
+                        <CDropdown>
+                          <CDropdownToggle color="link" size="sm" caret={false}>
+                            <CIcon icon={cilOptions} />
+                          </CDropdownToggle>
+                          <CDropdownMenu>
+                            <CDropdownItem onClick={() => handleEditCategory(category)}>Editar</CDropdownItem>
+                            <CDropdownItem onClick={() => handleDeleteCategory(category.id)}>Eliminar</CDropdownItem>
+                          </CDropdownMenu>
+                        </CDropdown>
+                      </div>
                     </div>
-                  </div>
-                  <CCardHeader>{category.name_category}</CCardHeader>
-                  <CCardBody>
-                    <CButton
-                      color="primary"
-                      onClick={() =>
-                        navigate(`/products/category/${category.id}/${category.name_category}`)
-                      }
-                    >
-                      Ver detalles
-                    </CButton>
-                  </CCardBody>
-                </CCard>
-              </CCol>
-            ))}
+                    <CCardHeader>{category.name}</CCardHeader>
+                    <CCardBody>
+                      <CButton
+                        color="primary"
+                        onClick={() =>
+                          navigate(`/products/api/category/${category.id}/${category.name}`)
+                        }
+                      >
+                        Ver detalles
+                      </CButton>
+                    </CCardBody>
+                  </CCard>
+                </CCol>
+              ))}
           </CRow>
         </CCardBody>
       </CCard>

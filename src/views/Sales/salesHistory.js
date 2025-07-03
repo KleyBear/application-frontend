@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react' 
 import {
   CCard,
   CCardHeader,
@@ -47,7 +47,15 @@ const SalesHistory = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true)
       try {
+        const token = localStorage.getItem('token')
+        if (!token) {
+          console.warn('No token found, please login.')
+          setLoading(false)
+          return
+        }
+
         const [
           saleRes,
           detailRes,
@@ -55,30 +63,71 @@ const SalesHistory = () => {
           userRes,
           categoryRes,
           roleRes,
-          accountRes,
-          paymentRes,
+          accountsReceivableRes,
+          paymentsRes,
         ] = await Promise.all([
-          fetch('http://localhost:8000/sale'),
-          fetch('http://localhost:8000/sale_detail'),
-          fetch('http://localhost:8000/product'),
-          fetch('http://localhost:8000/user'),
-          fetch('http://localhost:8000/category'),
-          fetch('http://localhost:8000/role'),
-          fetch('http://localhost:8000/accounts_receivable'),
-          fetch('http://localhost:8000/payment'),
+          fetch('http://localhost:4000/api/sales', {
+            headers: { Authorization: `Bearer ${token}` },
+            credentials: 'include',
+          }),
+          fetch('http://localhost:4000/api/saleDetail', {
+            headers: { Authorization: `Bearer ${token}` },
+            credentials: 'include',
+          }),
+          fetch('http://localhost:4000/api/products', {
+            headers: { Authorization: `Bearer ${token}` },
+            credentials: 'include',
+          }),
+          fetch('http://localhost:4000/api/users', {
+            headers: { Authorization: `Bearer ${token}` },
+            credentials: 'include',
+          }),
+          fetch('http://localhost:4000/api/category', {
+            headers: { Authorization: `Bearer ${token}` },
+            credentials: 'include',
+          }),
+          fetch('http://localhost:4000/api/roles', {
+            headers: { Authorization: `Bearer ${token}` },
+            credentials: 'include',
+          }),
+          fetch('http://localhost:4000/api/accountsReceivable', {
+            headers: { Authorization: `Bearer ${token}` },
+            credentials: 'include',
+          }),
+          fetch('http://localhost:4000/api/payments', {
+            headers: { Authorization: `Bearer ${token}` },
+            credentials: 'include',
+          }),
         ])
 
-        const [sales, details, products, users, categoriesData, rolesData, accounts, payments] =
-          await Promise.all([
-            saleRes.json(),
-            detailRes.json(),
-            productRes.json(),
-            userRes.json(),
-            categoryRes.json(),
-            roleRes.json(),
-            accountRes.json(),
-            paymentRes.json(),
-          ])
+        if (!saleRes.ok) throw new Error('Error al cargar ventas')
+        if (!detailRes.ok) throw new Error('Error al cargar detalles de venta')
+        if (!productRes.ok) throw new Error('Error al cargar productos')
+        if (!userRes.ok) throw new Error('Error al cargar usuarios')
+        if (!categoryRes.ok) throw new Error('Error al cargar categorías')
+        if (!roleRes.ok) throw new Error('Error al cargar roles')
+        if (!accountsReceivableRes.ok) throw new Error('Error al cargar cuentas por cobrar')
+        if (!paymentsRes.ok) throw new Error('Error al cargar pagos')
+
+        const [
+          sales,
+          details,
+          products,
+          users,
+          categoriesData,
+          rolesData,
+          accountsReceivable,
+          payments,
+        ] = await Promise.all([
+          saleRes.json(),
+          detailRes.json(),
+          productRes.json(),
+          userRes.json(),
+          categoryRes.json(),
+          roleRes.json(),
+          accountsReceivableRes.json(),
+          paymentsRes.json(),
+        ])
 
         const combined = sales.map((sale) => {
           const relatedDetails = details
@@ -94,7 +143,7 @@ const SalesHistory = () => {
           const user = users.find((u) => u.id === sale.id_user)
           const role = user ? rolesData.find((r) => r.id_role === user.id_role) : null
 
-          const accountReceivable = accounts.find((acc) => acc.id_sale === sale.id)
+          const accountReceivable = accountsReceivable.find((acc) => acc.id_sale === sale.id)
 
           let pendingAmount = 0
           if (accountReceivable) {
@@ -118,9 +167,10 @@ const SalesHistory = () => {
         setFilteredSales(combined)
         setCategories(categoriesData)
         setRoles(rolesData)
-        setLoading(false)
       } catch (error) {
-        console.error('Error cargando datos', error)
+        console.error('Error cargando datos:', error)
+      } finally {
+        setLoading(false)
       }
     }
     fetchData()
@@ -133,39 +183,31 @@ const SalesHistory = () => {
       filtered = filtered.filter((sale) => sale.status === filterStatus)
     }
 
-    if (filterUserName && filterUserName.trim() !== '') {
-      const searchLower = filterUserName.toLowerCase()
-      filtered = filtered.filter(
-        (sale) =>
-          sale.userRole?.name_role === filterUserRole &&
-          sale.user?.user_name.toLowerCase().includes(searchLower)
-      )
-    } else if (filterUserRole) {
+    if (filterUserRole) {
       filtered = filtered.filter((sale) => sale.userRole?.name_role === filterUserRole)
+    }
+
+    if (filterUserName.trim() !== '') {
+      const searchLower = filterUserName.toLowerCase()
+      filtered = filtered.filter((sale) =>
+        sale.user?.user_name.toLowerCase().includes(searchLower),
+      )
     }
 
     if (filterCategory) {
       filtered = filtered.filter((sale) =>
-        sale.details.some((detail) => detail.product?.id_category === filterCategory)
+        sale.details.some((detail) => detail.product?.id_category === filterCategory),
       )
     }
 
-    // ✅ Filtrar por fecha desde
     if (dateFrom) {
       const fromDate = new Date(dateFrom + 'T00:00:00')
-      filtered = filtered.filter((sale) => {
-        const saleDate = new Date(sale.date)
-        return saleDate >= fromDate
-      })
+      filtered = filtered.filter((sale) => new Date(sale.date) >= fromDate)
     }
 
-    // ✅ Filtrar por fecha hasta
     if (dateTo) {
       const toDate = new Date(dateTo + 'T23:59:59')
-      filtered = filtered.filter((sale) => {
-        const saleDate = new Date(sale.date)
-        return saleDate <= toDate
-      })
+      filtered = filtered.filter((sale) => new Date(sale.date) <= toDate)
     }
 
     setFilteredSales(filtered)
@@ -235,7 +277,6 @@ const SalesHistory = () => {
               value={filterUserName}
               onChange={(e) => setFilterUserName(e.target.value)}
               style={{ flex: 1, borderRadius: '25px' }}
-              disabled={!filterUserRole}
             />
           </CCol>
 
@@ -284,6 +325,7 @@ const SalesHistory = () => {
                     marginBottom: '10px',
                     boxShadow: isActive ? '0 0 15px rgba(141, 101, 252, 0.4)' : 'none',
                     transition: 'all 0.3s ease',
+                    cursor: 'pointer',
                   }}
                 >
                   <CAccordionHeader

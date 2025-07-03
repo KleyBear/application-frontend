@@ -14,10 +14,11 @@ import {
   CDropdownMenu,
   CDropdownToggle,
 } from '@coreui/react'
-import useFetch from '../../hooks/useFetch.js'
 import CIcon from '@coreui/icons-react'
 import { cilCart } from '@coreui/icons'
 import SaleFormDrawer from './SaleFormDrawer.js'
+
+const API_BASE = 'http://localhost:4000/api'
 
 const NewSale = () => {
   const [productsByCategory, setProductsByCategory] = useState({})
@@ -25,50 +26,85 @@ const NewSale = () => {
   const [selectedCategory, setSelectedCategory] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [drawerVisible, setDrawerVisible] = useState(false)
-
-  // NUEVO: carrito con productos seleccionados
   const [selectedProducts, setSelectedProducts] = useState([])
 
-  const { data: categoriesData } = useFetch('http://localhost:8000/category')
-  const { data: productsData } = useFetch('http://localhost:8000/product')
-
   useEffect(() => {
-    if (categoriesData && productsData) {
-      const grouped = {}
-      categoriesData.forEach((category) => {
-        grouped[category.id] = {
-          category,
-          products: productsData.filter((p) => p.id_category === category.id),
+    const fetchData = async () => {
+      try {
+        console.log('Iniciando fetchData...')
+        const token = localStorage.getItem('token')
+        console.log('Token encontrado:', token)
+
+        if (!token) {
+          throw new Error('No hay token disponible.')
         }
-      })
-      setCategories(categoriesData)
-      setProductsByCategory(grouped)
+
+        console.log('Haciendo fetch a categoría y productos...')
+        const [catRes, prodRes] = await Promise.all([
+          fetch(`${API_BASE}/category`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch(`${API_BASE}/products`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ])
+
+        console.log('Respuestas:', catRes.status, prodRes.status)
+
+        if (!catRes.ok || !prodRes.ok) {
+          throw new Error('Error al obtener datos del servidor.')
+        }
+
+        const catData = await catRes.json()
+        const prodData = await prodRes.json()
+
+        console.log('Datos recibidos:', catData, prodData)
+
+        const categoriesData = (catData.data || []).map((cat) => ({
+          ...cat,
+          name_category: cat.name,
+        }))
+        const productsData = prodData.data || []
+
+        const grouped = {}
+        categoriesData.forEach((category) => {
+          grouped[category.id] = {
+            category,
+            products: productsData.filter((p) => p.id_category === category.id),
+          }
+        })
+
+        setCategories(categoriesData)
+        setProductsByCategory(grouped)
+        console.log('Datos procesados y estado actualizado.')
+      } catch (err) {
+        console.error('Error al cargar categorías/productos:', err)
+      }
     }
-  }, [categoriesData, productsData])
+
+    fetchData()
+  }, [])
 
   const filteredProducts = (catId) => {
     const all = productsByCategory[catId]?.products || []
-    return all.filter((p) => p.description.toLowerCase().includes(searchQuery.toLowerCase()))
+    return all.filter((p) =>
+      p.description.toLowerCase().includes(searchQuery.toLowerCase())
+    )
   }
 
   const addProductToCart = (product) => {
-    const price = parseFloat(product.price_sale) // Asegurarse que es número
-
+    const price = parseFloat(product.price_sale)
     setSelectedProducts((prev) => {
       const index = prev.findIndex((p) => p.id === product.id)
-
       if (index !== -1) {
-        // Ya existe: aumenta cantidad y subtotal
         const updated = [...prev]
         updated[index].amount += 1
         updated[index].subtotal = updated[index].amount * price
         return updated
       } else {
-        // Nuevo producto con cantidad 1 y subtotal igual al precio
         return [...prev, { ...product, price_sale: price, amount: 1, subtotal: price }]
       }
     })
-
     setDrawerVisible(true)
   }
 
@@ -135,7 +171,7 @@ const NewSale = () => {
                         color="primary"
                         size="sm"
                         className="w-100 text-white"
-                        onClick={() => addProductToCart(product)} // AÑADIDO
+                        onClick={() => addProductToCart(product)}
                       >
                         <CIcon icon={cilCart} className="me-2" />
                         Añadir al carrito
@@ -143,7 +179,7 @@ const NewSale = () => {
                     </div>
                   </CCard>
                 </CCol>
-              )),
+              ))
             )}
           </CRow>
         </CCardBody>
@@ -173,8 +209,8 @@ const NewSale = () => {
       <SaleFormDrawer
         visible={drawerVisible}
         onClose={() => setDrawerVisible(false)}
-        selectedProducts={selectedProducts} // PASO carrito
-        setSelectedProducts={setSelectedProducts} // PASO setter para actualizar cantidades
+        selectedProducts={selectedProducts}
+        setSelectedProducts={setSelectedProducts}
       />
     </div>
   )

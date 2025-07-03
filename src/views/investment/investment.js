@@ -43,58 +43,45 @@ const Investment = () => {
     { key: "subtotal", label: "Subtotal ($)" },
   ];
 
-  // Función para formatear fecha sin desfase de zona horaria
-  function formatDate(dateString) {
-    let date;
-    if (typeof dateString === "string") {
-      const parts = dateString.split("-");
-      if (parts.length === 3) {
-        date = new Date(parts[0], parts[1] - 1, parts[2]);
-      } else {
-        date = new Date(dateString);
-      }
-    } else if (dateString instanceof Date) {
-      date = dateString;
-    } else {
-      return "Invalid date";
-    }
-
+  const formatDate = (dateString) => {
+    if (!dateString) return "No Date";
+    const date = new Date(dateString.replace(" ", "T"));
     if (isNaN(date)) return "Invalid date";
-
-    const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const year = date.getFullYear();
-
-    return `${day}/${month}/${year}`;
-  }
+    return `${date.getDate().toString().padStart(2, "0")}/${
+      (date.getMonth() + 1).toString().padStart(2, "0")
+    }/${date.getFullYear()}`;
+  };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+
         const [invRes, detailRes] = await Promise.all([
-          fetch("http://localhost:8000/investment"),
-          fetch("http://localhost:8000/investment_detail"),
+          fetch("http://localhost:4000/api/investments", {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch("http://localhost:4000/api/investmentDetail", {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
         ]);
 
-        const [investmentsData, detailsData] = await Promise.all([
-          invRes.json(),
-          detailRes.json(),
-        ]);
+        const investmentsData = await invRes.json();
+        const detailsData = await detailRes.json();
 
-        const investmentList = investmentsData.map((inv) => {
-          const items = detailsData
-            .filter((d) => d.id_investment === inv.id_investment)
+        const investmentList = investmentsData.data.map((inv) => {
+          const items = detailsData.data
+            .filter((d) => d.id_investment === inv.id)
             .map((detail) => ({
-              id:
-                detail.id_investment_detail ||
-                `${detail.id_investment}-${detail.id_product}`,
-              name: detail.name_product || "Unknown Product",
+              id: detail.id_investmentDetail || `${detail.id_investment}-${detail.id_product}`,
+              name: detail.name_product || `Product ID: ${detail.id_product}`,
               amount: detail.amount,
               subtotal: parseFloat(detail.subtotal || 0),
             }));
 
           return {
-            id: inv.id_investment,
+            id: inv.id,
             date: inv.date,
             items,
           };
@@ -102,9 +89,9 @@ const Investment = () => {
 
         setInvestments(investmentList);
         setFilteredInvestments(investmentList);
-        setLoading(false);
       } catch (error) {
         console.error("Error loading data:", error);
+      } finally {
         setLoading(false);
       }
     };
@@ -113,9 +100,6 @@ const Investment = () => {
   }, []);
 
   useEffect(() => {
-    // DEBUG: mostrar fechas en consola para verificar
-    console.log("Investments dates:", investments.map((i) => i.date));
-
     let filtered = [...investments];
 
     if (searchTerm.trim() !== "") {
@@ -127,13 +111,19 @@ const Investment = () => {
     }
 
     if (dateFrom) {
-      const fromDate = new Date(dateFrom + "T00:00:00");
-      filtered = filtered.filter((inv) => new Date(inv.date) >= fromDate);
+      const from = new Date(dateFrom + "T00:00:00");
+      filtered = filtered.filter((inv) => {
+        const invDate = new Date(inv.date.replace(" ", "T"));
+        return invDate >= from;
+      });
     }
 
     if (dateTo) {
-      const toDate = new Date(dateTo + "T23:59:59");
-      filtered = filtered.filter((inv) => new Date(inv.date) <= toDate);
+      const to = new Date(dateTo + "T23:59:59");
+      filtered = filtered.filter((inv) => {
+        const invDate = new Date(inv.date.replace(" ", "T"));
+        return invDate <= to;
+      });
     }
 
     setFilteredInvestments(filtered);
@@ -159,10 +149,7 @@ const Investment = () => {
   };
 
   const addDetailRow = () => {
-    setNewDetails((prev) => [
-      ...prev,
-      { name_product: "", amount: "", subtotal: "" },
-    ]);
+    setNewDetails((prev) => [...prev, { name_product: "", amount: "", subtotal: "" }]);
   };
 
   const removeDetailRow = (index) => {
@@ -170,61 +157,58 @@ const Investment = () => {
   };
 
   const handleAddInvestment = async () => {
-    if (!newDate) {
-      alert("Please select a date");
-      return;
-    }
-    if (newDetails.length === 0) {
-      alert("Please add at least one investment detail");
-      return;
-    }
-    for (const d of newDetails) {
-      if (!d.name_product || !d.amount || !d.subtotal) {
-        alert("Please complete all detail fields");
-        return;
-      }
-    }
+    if (!newDate || newDetails.length === 0) return;
+
+    const isValid = newDetails.every(
+      (d) => d.name_product && d.amount && d.subtotal
+    );
+    if (!isValid) return;
 
     try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
       const total = newDetails.reduce(
         (acc, cur) => acc + parseFloat(cur.subtotal),
         0
       );
 
-      // Enviar nueva inversión (sin provider, solo fecha y total)
-      const invResponse = await fetch("http://localhost:8000/investment", {
+      const invResponse = await fetch("http://localhost:4000/api/investments", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
           date: newDate,
           total,
         }),
       });
 
-      if (!invResponse.ok) throw new Error("Failed to create investment");
-
       const createdInv = await invResponse.json();
 
-      // Enviar detalles asociados
       for (const d of newDetails) {
-        await fetch("http://localhost:8000/investment_detail", {
+        await fetch("http://localhost:4000/api/investmentDetail", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify({
             amount: parseInt(d.amount),
             subtotal: parseFloat(d.subtotal),
             id_product: null,
-            id_investment: createdInv.id_investment,
+            id_investment: createdInv.data.id,
             name_product: d.name_product,
           }),
         });
       }
 
       const newInvObject = {
-        id: createdInv.id_investment,
-        date: newDate, // importante mantener el formato exacto
+        id: createdInv.data.id,
+        date: newDate + " 00:00:00",
         items: newDetails.map((d, i) => ({
-          id: `new-${createdInv.id_investment}-${i + 1}`,
+          id: `new-${createdInv.data.id}-${i + 1}`,
           name: d.name_product,
           amount: d.amount,
           subtotal: parseFloat(d.subtotal),
@@ -237,7 +221,6 @@ const Investment = () => {
       setNewDetails([]);
     } catch (error) {
       console.error("Error saving investment:", error);
-      alert("Error saving investment. Check console for details.");
     }
   };
 
@@ -248,8 +231,7 @@ const Investment = () => {
           <CCol xs="12" md="4">
             <h2>Investment History</h2>
           </CCol>
-
-          <CCol xs="12" md="4" className="d-flex gap-2">
+          <CCol xs="12" md="4">
             <CFormInput
               type="text"
               placeholder="Search by product..."
@@ -258,7 +240,6 @@ const Investment = () => {
               style={{ borderRadius: "25px" }}
             />
           </CCol>
-
           <CCol xs="6" md="2">
             <CFormInput
               type="date"
@@ -267,7 +248,6 @@ const Investment = () => {
               max={dateTo || ""}
             />
           </CCol>
-
           <CCol xs="6" md="2">
             <CFormInput
               type="date"
@@ -286,11 +266,7 @@ const Investment = () => {
           </CButton>
         </div>
 
-        <CModal
-          visible={modalVisible}
-          onClose={() => setModalVisible(false)}
-          size="lg"
-        >
+        <CModal visible={modalVisible} onClose={() => setModalVisible(false)} size="lg">
           <CModalHeader>Add New Investment</CModalHeader>
           <CModalBody>
             <CRow className="mb-3">
@@ -303,11 +279,8 @@ const Investment = () => {
                 />
               </CCol>
             </CRow>
-
             <hr />
-
             <h5>Investment Details</h5>
-
             {newDetails.map((detail, index) => (
               <CRow key={index} className="mb-2 align-items-center">
                 <CCol md={4}>
@@ -315,9 +288,7 @@ const Investment = () => {
                     type="text"
                     placeholder="Product Name"
                     value={detail.name_product || ""}
-                    onChange={(e) =>
-                      handleDetailChange(index, "name_product", e.target.value)
-                    }
+                    onChange={(e) => handleDetailChange(index, "name_product", e.target.value)}
                   />
                 </CCol>
                 <CCol md={3}>
@@ -326,9 +297,7 @@ const Investment = () => {
                     min="1"
                     placeholder="Amount"
                     value={detail.amount}
-                    onChange={(e) =>
-                      handleDetailChange(index, "amount", e.target.value)
-                    }
+                    onChange={(e) => handleDetailChange(index, "amount", e.target.value)}
                   />
                 </CCol>
                 <CCol md={3}>
@@ -338,33 +307,22 @@ const Investment = () => {
                     step="0.01"
                     placeholder="Subtotal"
                     value={detail.subtotal}
-                    onChange={(e) =>
-                      handleDetailChange(index, "subtotal", e.target.value)
-                    }
+                    onChange={(e) => handleDetailChange(index, "subtotal", e.target.value)}
                   />
                 </CCol>
                 <CCol md={2}>
-                  <CButton
-                    color="danger"
-                    size="sm"
-                    onClick={() => removeDetailRow(index)}
-                  >
+                  <CButton color="danger" size="sm" onClick={() => removeDetailRow(index)}>
                     Remove
                   </CButton>
                 </CCol>
               </CRow>
             ))}
-
             <CButton color="success" size="sm" onClick={addDetailRow}>
               + Add Detail
             </CButton>
           </CModalBody>
-
           <CModalFooter>
-            <CButton
-              color="secondary"
-              onClick={() => setModalVisible(false)}
-            >
+            <CButton color="secondary" onClick={() => setModalVisible(false)}>
               Cancel
             </CButton>
             <CButton color="primary" onClick={handleAddInvestment}>
@@ -395,9 +353,7 @@ const Investment = () => {
                     style={{
                       borderRadius: "12px",
                       marginBottom: "10px",
-                      boxShadow: isActive
-                        ? "0 0 15px rgba(141, 101, 252, 0.4)"
-                        : "none",
+                      boxShadow: isActive ? "0 0 15px rgba(141, 101, 252, 0.4)" : "none",
                       transition: "all 0.3s ease",
                     }}
                   >
@@ -435,18 +391,11 @@ const Investment = () => {
             </CAccordion>
 
             <CPagination className="mt-4">
-              <CPaginationItem
-                disabled={page === 1}
-                onClick={() => setPage((p) => Math.max(p - 1, 1))}
-              >
+              <CPaginationItem disabled={page === 1} onClick={() => setPage((p) => Math.max(p - 1, 1))}>
                 Previous
               </CPaginationItem>
               {Array.from({ length: pageCount }, (_, i) => (
-                <CPaginationItem
-                  key={i}
-                  active={page === i + 1}
-                  onClick={() => setPage(i + 1)}
-                >
+                <CPaginationItem key={i} active={page === i + 1} onClick={() => setPage(i + 1)}>
                   {i + 1}
                 </CPaginationItem>
               ))}

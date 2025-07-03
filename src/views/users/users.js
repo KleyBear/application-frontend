@@ -20,6 +20,8 @@ import {
   CForm,
   CFormLabel,
   CButton,
+  CFormSelect,
+  CAlert,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilPeople, cilPencil, cilTrash, cilCloudDownload, cilPlus } from '@coreui/icons'
@@ -27,145 +29,195 @@ import useFetch from '../../hooks/useFetch'
 
 const Users = () => {
   const [users, setUsers] = useState([])
-  const [searchTerm, setSearchTerm] = useState('') // Estado para el término de búsqueda
-  const [filteredUsers, setFilteredUsers] = useState([]) // Estado para los usuarios filtrados
-  const [visible, setVisible] = useState(false) // Estado para el modal de edición
-  const [visibleAdd, setVisibleAdd] = useState(false) // Estado para el modal de agregar
+  const [searchTerm, setSearchTerm] = useState('')
+  const [filteredUsers, setFilteredUsers] = useState([])
+  const [visibleEdit, setVisibleEdit] = useState(false)
+  const [visibleAdd, setVisibleAdd] = useState(false)
   const [selectedUser, setSelectedUser] = useState(null)
+
   const [editFormData, setEditFormData] = useState({
-    user_name: '',
+    name: '',
     email: '',
     phone: '',
     birthdate: '',
-    id_role: '',
+    id_rol: '',
   })
+
   const [addFormData, setAddFormData] = useState({
-    user_name: '',
+    name: '',
     email: '',
     phone: '',
     birthdate: '',
-    id_role: '',
+    id_rol: '',
     password: '',
   })
 
-  const { data, loading: loading, error: error } = useFetch('http://localhost:8000/user')
-  const { data: roles } = useFetch('http://localhost:8000/role')
+  const [errorMsg, setErrorMsg] = useState('')
+
+  // Formatear fecha YYYY-MM-DD
+  const formatDate = (dateString) => {
+    if (!dateString) return ''
+    return new Date(dateString).toISOString().split('T')[0]
+  }
+
+  // Traer usuarios (sin roles aparte)
+  const { data, loading, error } = useFetch('http://localhost:4000/api/users')
 
   useEffect(() => {
-    if (data) {
-      setUsers(data) // Actualiza los usuarios con los datos obtenidos de la API
+    if (Array.isArray(data?.data)) {
+      setUsers(data.data)
     }
   }, [data])
 
-  // Filtrado de usuarios basado en el término de búsqueda
   useEffect(() => {
-    const filtered = users.filter(
-      (user) =>
-        user.user_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.phone.includes(searchTerm),
-    )
-    setFilteredUsers(filtered)
+    if (Array.isArray(users)) {
+      const filtered = users.filter((user) => {
+        const name = user.name?.toLowerCase() || ''
+        const email = user.email?.toLowerCase() || ''
+        const phone = user.phone || ''
+        return (
+          name.includes(searchTerm) ||
+          email.includes(searchTerm) ||
+          phone.includes(searchTerm)
+        )
+      })
+      setFilteredUsers(filtered)
+    }
   }, [searchTerm, users])
 
   const handleSearchChange = (event) => {
-    const value = event.target.value.toLowerCase()
-    setSearchTerm(value)
-
-    // Filtrar usuarios según el término de búsqueda
-    const filtered = users.filter(
-      (user) =>
-        user.user_name.toLowerCase().includes(value) ||
-        user.email.toLowerCase().includes(value) ||
-        user.phone.includes(value),
-    )
-    setFilteredUsers(filtered)
+    setSearchTerm(event.target.value.toLowerCase())
   }
 
+  const getToken = () => localStorage.getItem('token')
+
   const handleDelete = async (userId) => {
+    setErrorMsg('')
     try {
-      const response = await fetch(`http://localhost:8000/user/${userId}`, {
-        method: 'DELETE',
-      })
-      if (!response.ok) {
-        throw new Error('Error al eliminar usuario')
+      const token = getToken()
+      if (!token) {
+        setErrorMsg('No autorizado para eliminar usuarios.')
+        return
       }
-      const updatedUsers = users.filter((user) => user.id !== userId)
-      setUsers(updatedUsers)
+
+      const response = await fetch(`http://localhost:4000/api/users/${userId}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      if (!response.ok) throw new Error('Error al eliminar usuario')
+      setUsers(users.filter((user) => user.id !== userId))
     } catch (error) {
       console.error(error)
-      alert('Error eliminando el usuario')
+      setErrorMsg('Error eliminando el usuario')
     }
   }
 
   const handleEdit = (user) => {
     setSelectedUser(user)
     setEditFormData({
-      user_name: user.user_name,
+      name: user.name,
       email: user.email,
       phone: user.phone,
-      birthdate: user.birthdate,
-      id_role: user.id_role || '',
+      birthdate: formatDate(user.birthdate),
+      id_rol: user.id_rol ? String(user.id_rol) : '',
     })
-    setVisible(true)
+    setErrorMsg('')
+    setVisibleEdit(true)
   }
 
   const handleEditFormChange = (event) => {
     setEditFormData({ ...editFormData, [event.target.name]: event.target.value })
   }
 
-  // Función la actualización de un usuario
   const handleUpdate = async () => {
+    setErrorMsg('')
+    // Validaciones básicas
+    if (!editFormData.name || !editFormData.email) {
+      setErrorMsg('Nombre y correo son obligatorios para actualizar.')
+      return
+    }
     try {
-      const response = await fetch(`http://localhost:8000/user/${selectedUser.id}`, {
+      const token = getToken()
+      if (!token) {
+        setErrorMsg('No autorizado para actualizar usuarios.')
+        return
+      }
+      const response = await fetch(`http://localhost:4000/api/users/${selectedUser.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(editFormData),
+        body: JSON.stringify({
+          ...editFormData,
+          id_rol: Number(editFormData.id_rol),
+        }),
       })
-      if (!response.ok) {
-        throw new Error('Error al actualizar el usuario')
-      }
-      const updatedUser = await response.json()
-      const updatedUsers = users.map((user) => (user.id === selectedUser.id ? updatedUser : user))
-      setUsers(updatedUsers)
-      setVisible(false)
+      if (!response.ok) throw new Error('Error al actualizar el usuario')
+      const result = await response.json()
+      const updatedUser = result.data
+      setUsers(users.map((user) => (user.id === selectedUser.id ? updatedUser : user)))
+      setVisibleEdit(false)
+      setSelectedUser(null)
     } catch (error) {
       console.error(error)
-      alert('Error actualizando el usuario')
+      setErrorMsg('Error actualizando el usuario')
     }
   }
 
-  // Funciones para el modal de agregar
   const handleAddFormChange = (event) => {
     setAddFormData({ ...addFormData, [event.target.name]: event.target.value })
   }
 
   const handleAdd = async () => {
-    const newUser = { ...addFormData }
+    setErrorMsg('')
+    // Validaciones básicas
+    if (!addFormData.name || !addFormData.email || !addFormData.password) {
+      setErrorMsg('Nombre, correo y contraseña son obligatorios.')
+      return
+    }
     try {
-      const response = await fetch('http://localhost:800/user', {
+      const token = getToken()
+      if (!token) {
+        setErrorMsg('No autorizado para agregar usuarios.')
+        return
+      }
+      const bodyToSend = {
+        ...addFormData,
+        id_rol: Number(addFormData.id_rol),
+      }
+
+      const response = await fetch('http://localhost:4000/api/users', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(newUser),
+        body: JSON.stringify(bodyToSend),
       })
-      if (!response.ok) throw new Error('Error al agregar usuario')
-      const createdUser = await response.json()
-      setUsers([...users, createdUser])
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        console.error('Error del backend:', errorData)
+        setErrorMsg('Error agregando el usuario')
+        return
+      }
+      const result = await response.json()
+      setUsers([...users, result.data])
       setVisibleAdd(false)
+      setAddFormData({
+        name: '',
+        email: '',
+        phone: '',
+        birthdate: '',
+        id_rol: '',
+        password: '',
+      })
     } catch (error) {
       console.error(error)
-      alert('Hubo un problema al agregar el usuario.')
+      setErrorMsg('Error agregando el usuario')
     }
-  }
-
-  // Función para obtener el nombre del rol según el ID
-  const getRoleName = (roleId) => {
-    const role = roles.find((role) => role.id_role === parseInt(roleId))
-    return role ? role.name_role : 'Unknown Role' // Ajusta para usar name_role
   }
 
   if (loading) return <p>Cargando...</p>
@@ -176,39 +228,42 @@ const Users = () => {
       <CCardHeader>
         <CButton color="success" className="float-end" onClick={() => setVisibleAdd(true)}>
           <CIcon icon={cilPlus} /> <CIcon icon={cilPeople} className="ms-1 me-2" />
+          Añadir usuario
         </CButton>
         <CButton color="primary" className="float-end me-2">
           <CIcon icon={cilCloudDownload} />
         </CButton>
 
         <CContainer fluid>
-          <CForm className="d-flex" style={{ maxWidth: '300px' }}>
+          <CForm className="d-flex" style={{ maxWidth: '300px' }} onSubmit={(e) => e.preventDefault()}>
             <CFormInput
               type="search"
               className="me-2"
-              placeholder="Search"
+              placeholder="Buscar"
               value={searchTerm}
-              onChange={handleSearchChange} // Manejar cambios en el cuadro de búsqueda
+              onChange={handleSearchChange}
             />
             <CButton type="submit" color="success" variant="outline">
-              Search
+              Buscar
             </CButton>
           </CForm>
         </CContainer>
       </CCardHeader>
+
       <CCardBody>
+        {errorMsg && <CAlert color="danger">{errorMsg}</CAlert>}
         <CTable align="middle" className="mb-0 border" hover responsive>
           <CTableHead color="black">
-            <CTableRow key={users.id}>
+            <CTableRow>
               <CTableHeaderCell className="text-center">
                 <CIcon icon={cilPeople} />
               </CTableHeaderCell>
-              <CTableHeaderCell>User</CTableHeaderCell>
+              <CTableHeaderCell>Usuario</CTableHeaderCell>
               <CTableHeaderCell>Email</CTableHeaderCell>
-              <CTableHeaderCell>Phone</CTableHeaderCell>
-              <CTableHeaderCell>birthdate</CTableHeaderCell>
+              <CTableHeaderCell>Teléfono</CTableHeaderCell>
+              <CTableHeaderCell>Fecha Nac.</CTableHeaderCell>
               <CTableHeaderCell>Rol</CTableHeaderCell>
-              <CTableHeaderCell>Actions</CTableHeaderCell>
+              <CTableHeaderCell>Acciones</CTableHeaderCell>
             </CTableRow>
           </CTableHead>
           <CTableBody>
@@ -217,28 +272,13 @@ const Users = () => {
                 <CTableDataCell className="text-center">
                   <CAvatar size="md" src={`avatars/${user.id}.jpg`} />
                 </CTableDataCell>
+                <CTableDataCell>{user.name}</CTableDataCell>
+                <CTableDataCell>{user.email}</CTableDataCell>
+                <CTableDataCell>{user.phone}</CTableDataCell>
+                <CTableDataCell>{formatDate(user.birthdate)}</CTableDataCell>
+                <CTableDataCell>{user.rol?.name || 'Unknown Role'}</CTableDataCell>
                 <CTableDataCell>
-                  <div>{user.user_name}</div>
-                </CTableDataCell>
-                <CTableDataCell>
-                  <div>{user.email}</div>
-                </CTableDataCell>
-                <CTableDataCell>
-                  <div>{user.phone}</div>
-                </CTableDataCell>
-                <CTableDataCell>
-                  <div>{user.birthdate}</div>
-                </CTableDataCell>
-                <CTableDataCell>
-                  <div>{getRoleName(user.id_role)}</div>
-                </CTableDataCell>
-                <CTableDataCell>
-                  <CButton
-                    color="primary"
-                    size="sm"
-                    className="me-2"
-                    onClick={() => handleEdit(user)}
-                  >
+                  <CButton color="primary" size="sm" className="me-2" onClick={() => handleEdit(user)}>
                     <CIcon icon={cilPencil} />
                   </CButton>
                   <CButton color="danger" size="sm" onClick={() => handleDelete(user.id)}>
@@ -251,124 +291,126 @@ const Users = () => {
         </CTable>
       </CCardBody>
 
-      {/* Modal de Editar Usuario */}
-      <CModal visible={visible} onClose={() => setVisible(false)}>
+      {/* Modal de edición */}
+      <CModal visible={visibleEdit} onClose={() => setVisibleEdit(false)}>
         <CModalHeader>
-          <CModalTitle>Edit User</CModalTitle>
+          <CModalTitle>Editar Usuario</CModalTitle>
         </CModalHeader>
         <CModalBody>
-          <CFormLabel>User Name</CFormLabel> {/* Agregué etiquetas */}
-          <CFormInput
-            type="text"
-            name="user_name"
-            value={editFormData.user_name}
-            onChange={handleEditFormChange}
-          />
-          <CFormLabel>Email</CFormLabel>
-          <CFormInput
-            type="email"
-            name="email"
-            label="Email"
-            value={editFormData.email}
-            onChange={handleEditFormChange}
-          />
-          <CFormLabel>Phone</CFormLabel>
-          <CFormInput
-            type="text"
-            name="phone"
-            label="Phone"
-            value={editFormData.phone}
-            onChange={handleEditFormChange}
-          />
-          <CFormLabel>Birthdate</CFormLabel>
-          <CFormInput
-            type="text"
-            name="birthdate"
-            label="Birthdate"
-            value={editFormData.birthdate}
-            onChange={handleEditFormChange}
-          />
-          <CFormLabel>Rol</CFormLabel>
-          <CFormInput
-            type="number"
-            name="id_role"
-            label="Rol"
-            value={editFormData.id_role}
-            onChange={handleEditFormChange}
-          />
-          <CFormLabel>Password</CFormLabel>
-          <CFormInput
-            type="password"
-            name="password"
-            value={addFormData.password}
-            onChange={handleAddFormChange}
-          />
+          <CForm>
+            <CFormLabel>Nombre</CFormLabel>
+            <CFormInput
+              name="name"
+              value={editFormData.name}
+              onChange={handleEditFormChange}
+              required
+            />
+            <CFormLabel className="mt-2">Email</CFormLabel>
+            <CFormInput
+              type="email"
+              name="email"
+              value={editFormData.email}
+              onChange={handleEditFormChange}
+              required
+            />
+            <CFormLabel className="mt-2">Teléfono</CFormLabel>
+            <CFormInput
+              name="phone"
+              value={editFormData.phone}
+              onChange={handleEditFormChange}
+            />
+            <CFormLabel className="mt-2">Fecha de nacimiento</CFormLabel>
+            <CFormInput
+              type="date"
+              name="birthdate"
+              value={editFormData.birthdate}
+              onChange={handleEditFormChange}
+            />
+            <CFormLabel className="mt-2">Rol</CFormLabel>
+            <CFormSelect
+              name="id_rol"
+              value={editFormData.id_rol}
+              onChange={handleEditFormChange}
+            >
+              <option value="">Seleccione un rol</option>
+              <option value="1">Admin</option>
+              <option value="2">Usuario</option>
+              {/* Ajusta roles según los que manejes */}
+            </CFormSelect>
+          </CForm>
         </CModalBody>
         <CModalFooter>
-          <CButton color="secondary" onClick={() => setVisible(false)}>
-            Close
+          <CButton color="secondary" onClick={() => setVisibleEdit(false)}>
+            Cancelar
           </CButton>
           <CButton color="primary" onClick={handleUpdate}>
-            Save changes
+            Guardar
           </CButton>
         </CModalFooter>
       </CModal>
 
-      {/* Modal de Agregar Usuario */}
+      {/* Modal de añadir */}
       <CModal visible={visibleAdd} onClose={() => setVisibleAdd(false)}>
         <CModalHeader>
-          <CModalTitle>Add User</CModalTitle>
+          <CModalTitle>Añadir Usuario</CModalTitle>
         </CModalHeader>
         <CModalBody>
-          <CFormLabel>User Name</CFormLabel>
-          <CFormInput
-            type="text"
-            name="user_name"
-            value={addFormData.user_name}
-            onChange={handleAddFormChange}
-          />
-          <CFormLabel>Email</CFormLabel>
-          <CFormInput
-            type="email"
-            name="email"
-            value={addFormData.email}
-            onChange={handleAddFormChange}
-          />
-          <CFormLabel>Phone</CFormLabel>
-          <CFormInput
-            type="text"
-            name="phone"
-            value={addFormData.phone}
-            onChange={handleAddFormChange}
-          />
-          <CFormLabel>Birthdate</CFormLabel>
-          <CFormInput
-            type="text"
-            name="birthdate"
-            value={addFormData.birthdate}
-            onChange={handleAddFormChange}
-          />
-          <CFormLabel>Rol</CFormLabel>
-          <CFormInput
-            type="number"
-            name="id_role"
-            value={addFormData.id_role}
-            onChange={handleAddFormChange}
-          />
-          <CFormLabel>Password</CFormLabel>
-          <CFormInput
-            type="password"
-            name="password"
-            value={addFormData.password}
-            onChange={handleAddFormChange}
-          />
+          <CForm>
+            <CFormLabel>Nombre</CFormLabel>
+            <CFormInput
+              name="name"
+              value={addFormData.name}
+              onChange={handleAddFormChange}
+              required
+            />
+            <CFormLabel className="mt-2">Email</CFormLabel>
+            <CFormInput
+              type="email"
+              name="email"
+              value={addFormData.email}
+              onChange={handleAddFormChange}
+              required
+            />
+            <CFormLabel className="mt-2">Contraseña</CFormLabel>
+            <CFormInput
+              type="password"
+              name="password"
+              value={addFormData.password}
+              onChange={handleAddFormChange}
+              required
+            />
+            <CFormLabel className="mt-2">Teléfono</CFormLabel>
+            <CFormInput
+              name="phone"
+              value={addFormData.phone}
+              onChange={handleAddFormChange}
+            />
+            <CFormLabel className="mt-2">Fecha de nacimiento</CFormLabel>
+            <CFormInput
+              type="date"
+              name="birthdate"
+              value={addFormData.birthdate}
+              onChange={handleAddFormChange}
+            />
+            <CFormLabel className="mt-2">Rol</CFormLabel>
+            <CFormSelect
+              name="id_rol"
+              value={addFormData.id_rol}
+              onChange={handleAddFormChange}
+            >
+              <option value="">Seleccione un rol</option>
+              <option value="1">Admin</option>
+              <option value="2">Usuario</option>
+              {/* Ajusta roles según los que manejes */}
+            </CFormSelect>
+          </CForm>
         </CModalBody>
         <CModalFooter>
           <CButton color="secondary" onClick={() => setVisibleAdd(false)}>
-            Close
+            Cancelar
           </CButton>
-          <CButton color="primary" onClick={handleAdd}>
-            Add User
+          <CButton color="success" onClick={handleAdd}>
+            Añadir
           </CButton>
         </CModalFooter>
       </CModal>

@@ -8,10 +8,19 @@ const useFetch = (url) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(url)
+        const token = localStorage.getItem('token') // ← obtenemos el token del localStorage
+
+        const response = await fetch(url, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`, // ← incluimos el token
+          },
+        })
+
         if (!response.ok) {
           throw new Error('Error al obtener los datos')
         }
+
         const result = await response.json()
         setData(result)
       } catch (error) {

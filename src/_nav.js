@@ -20,11 +20,11 @@ const _nav = [
         name: 'Products',
         to: '/products',
       },
-      {
-        component: CNavItem,
-        name: 'Providers',
-        to: '/suppliers',
-      },
+      // {
+      //   component: CNavItem,
+      //   name: 'Providers',
+      //   to: '/suppliers',
+      // },
     ],
   },
   {
