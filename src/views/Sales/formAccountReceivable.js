@@ -15,23 +15,53 @@ import {
   CFormInput,
 } from '@coreui/react'
 
-const FormAccountReceivable = ({ visible, onClose, onSave }) => {
+const FormAccountReceivable = ({ visible, onClose, sale }) => {
   const [expirationDays, setExpirationDays] = useState(7)
   const [amountPaid, setAmountPaid] = useState(0.01)
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const today = new Date()
     const expirationDate = new Date()
     expirationDate.setDate(today.getDate() + expirationDays)
 
-    const data = {
-      expiration_date: expirationDate.toISOString().split('T')[0],
-      amount_paid: parseFloat(amountPaid),
-      payment_date: today.toISOString().split('T')[0],
-    }
+    const expiration_date = expirationDate.toISOString().split('T')[0]
+    const payment_date = today.toISOString().split('T')[0]
+    const payment_method = sale.payment_method || 'Cash'
 
-    onSave(data)
-    onClose()
+    try {
+      // Paso 1: Guardar en accounts_receivable
+      const resAccount = await fetch('http://localhost:8000/accounts_receivable', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id_sale: sale.id,
+          expiration_date,
+        }),
+      })
+
+      if (!resAccount.ok) throw new Error('Error al guardar cuenta por cobrar')
+
+      const newAccount = await resAccount.json() // contiene { id, id_sale, expiration_date }
+
+      // Paso 2: Guardar en payment usando el ID generado en accounts_receivable
+      const resPayment = await fetch('http://localhost:8000/payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id_accounts_receivable: newAccount.id, // <-- este ID es clave
+          amount_paid: parseFloat(amountPaid),
+          payment_date,
+          payment_method,
+        }),
+      })
+
+      if (!resPayment.ok) throw new Error('Error al registrar el abono inicial')
+
+      // Cierre del modal si todo va bien
+      onClose()
+    } catch (error) {
+      alert('Error: ' + error.message)
+    }
   }
 
   return (
@@ -45,30 +75,17 @@ const FormAccountReceivable = ({ visible, onClose, onSave }) => {
             <CAccordionItem itemKey={1}>
               <CAccordionHeader>Seleccionar Fecha de Expiración</CAccordionHeader>
               <CAccordionBody>
-                <CFormCheck
-                  type="radio"
-                  name="expiration"
-                  label="7 días"
-                  value={7}
-                  checked={expirationDays === 7}
-                  onChange={() => setExpirationDays(7)}
-                />
-                <CFormCheck
-                  type="radio"
-                  name="expiration"
-                  label="15 días"
-                  value={15}
-                  checked={expirationDays === 15}
-                  onChange={() => setExpirationDays(15)}
-                />
-                <CFormCheck
-                  type="radio"
-                  name="expiration"
-                  label="30 días"
-                  value={30}
-                  checked={expirationDays === 30}
-                  onChange={() => setExpirationDays(30)}
-                />
+                {[7, 15, 30].map((days) => (
+                  <CFormCheck
+                    key={days}
+                    type="radio"
+                    name="expiration"
+                    label={`${days} días`}
+                    value={days}
+                    checked={expirationDays === days}
+                    onChange={() => setExpirationDays(days)}
+                  />
+                ))}
               </CAccordionBody>
             </CAccordionItem>
           </CAccordion>
